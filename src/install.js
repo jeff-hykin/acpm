@@ -1,21 +1,21 @@
-const assert              = require("assert")
-const path                = require("path")
-const _                   = require("@aminya/underscore-plus")
-const asyncLib            = require("async")
-const CSON                = require("season")
-const yargs               = require("yargs")
-const Git                 = require("git-utils")
-const semver              = require("semver")
-const temp                = require("temp")
-const hostedGitInfo       = require("hosted-git-info")
-const config              = require("./apm")
-const Command             = require("./command")
-const fs                  = require("fysh")
-const RebuildModuleCache  = require("./rebuild-module-cache")
-const request             = require("./request")
+const assert = require("assert")
+const path = require("path")
+const _ = require("@aminya/underscore-plus")
+const asyncLib = require("async")
+const CSON = require("season")
+const yargs = require("yargs")
+const Git = require("git-utils")
+const semver = require("semver")
+const temp = require("temp")
+const hostedGitInfo = require("hosted-git-info")
+const config = require("./apm")
+const Command = require("./command")
+const fs = require("fysh")
+const RebuildModuleCache = require("./rebuild-module-cache")
+const request = require("./request")
 const isDeprecatedPackage = require("./deprecated-packages").isDeprecatedPackage
-const rm                  = require("rimraf")
-const ncp                 = require("ncp")
+const rm = require("rimraf")
+const ncp = require("ncp")
 
 // TODO: this needs to be removed because ncp is deprecated and unmaintained
 //       however, replacing this with fs.copySync causes problems with system links not being copied
@@ -34,6 +34,26 @@ function cp(sourcePath, destinationPath, callback) {
 module.exports = class Install extends Command {
     constructor() {
         super()
+
+        this.installModules = (options, callback) => {
+            if (!options.argv.json) {
+                process.stdout.write("Installing modules ")
+            }
+
+            return this.forkInstallCommand(options, (...args) => {
+                if (options.argv.json) {
+                    return this.logCommandResultsIfFail(callback, ...Array.from(args))
+                } else {
+                    return this.logCommandResults(callback, ...Array.from(args))
+                }
+            })
+        }
+
+        this.installGitPackageDependencies = (directory, options, callback) => {
+            options.cwd = directory
+            return this.installDependencies(options, callback)
+        }
+
         this.atomDirectory = config.getAtomDirectory()
         this.atomPackagesDirectory = path.join(this.atomDirectory, "packages")
         this.atomNodeDirectory = path.join(this.atomDirectory, ".node-gyp")
@@ -75,32 +95,37 @@ package names to install with optional versions using the
     installModule(options, pack, moduleURI, callback) {
         let installDirectory, nodeModulesDirectory
         const installGlobally = options.installGlobally != null ? options.installGlobally : true
-
         const installArgs = ["--globalconfig", config.getGlobalConfigPath(), "--userconfig", config.getUserConfigPath(), "install"]
         installArgs.push(moduleURI)
         installArgs.push(...Array.from(this.getNpmBuildFlags() || []))
+
         if (installGlobally) {
             installArgs.push("--global-style")
         }
+
         if (options.argv.silent) {
             installArgs.push("--silent")
         }
+
         if (options.argv.quiet) {
             installArgs.push("--quiet")
         }
+
         if (options.argv.production) {
             installArgs.push("--production")
         }
+
         if (options.argv.verbose) {
             installArgs.push("--verbose")
         }
 
         fs.makeTreeSync(this.atomDirectory)
-
         const env = { ...process.env, HOME: this.atomNodeDirectory, RUSTUP_HOME: config.getRustupHomeDirPath() }
         this.addBuildEnvVars(env)
+        const installOptions = {
+            env,
+        }
 
-        const installOptions = { env }
         if (this.verbose) {
             installOptions.streaming = true
         }
@@ -115,6 +140,7 @@ package names to install with optional versions using the
         return this.fork(this.atomNpmPath, installArgs, installOptions, (code, stderr = "", stdout = "") => {
             if (code === 0) {
                 let child, destination
+
                 if (installGlobally) {
                     const commands = []
                     const children = fs.readdirSync(nodeModulesDirectory).filter((dir) => dir !== ".bin")
@@ -125,7 +151,6 @@ package names to install with optional versions using the
                     commands.push((next) => cp(source, destination, next))
                     commands.push((next) => this.buildModuleCache(pack.name, next))
                     commands.push((next) => this.warmCompileCache(pack.name, next))
-
                     return asyncLib.waterfall(commands, (error) => {
                         if (error != null) {
                             this.logFailure()
@@ -134,10 +159,17 @@ package names to install with optional versions using the
                                 this.logSuccess()
                             }
                         }
-                        return callback(error, { name: child, installPath: destination })
+
+                        return callback(error, {
+                            name: child,
+                            installPath: destination,
+                        })
                     })
                 } else {
-                    return callback(null, { name: child, installPath: destination })
+                    return callback(null, {
+                        name: child,
+                        installPath: destination,
+                    })
                 }
             } else {
                 if (installGlobally) {
@@ -146,9 +178,11 @@ package names to install with optional versions using the
                 }
 
                 let error = `${stdout}\n${stderr}`
+
                 if (error.indexOf("code ENOGIT") !== -1) {
                     error = this.getGitErrorMessage(pack)
                 }
+
                 return callback(error)
             }
         })
@@ -172,6 +206,7 @@ You can install Git by downloading, installing, and launching GitHub for Windows
 \
 `
                 break
+
             case "linux":
                 message += `\
 
@@ -185,58 +220,47 @@ You can install Git from your OS package manager.
 
 Run apm -v after installing Git to see what version has been detected.\
 `
-
         return message
-    }
-
-    installModules = (options, callback) => {
-        if (!options.argv.json) {
-            process.stdout.write("Installing modules ")
-        }
-
-        return this.forkInstallCommand(options, (...args) => {
-            if (options.argv.json) {
-                return this.logCommandResultsIfFail(callback, ...Array.from(args))
-            } else {
-                return this.logCommandResults(callback, ...Array.from(args))
-            }
-        })
     }
 
     forkInstallCommand(options, callback) {
         const installArgs = ["--globalconfig", config.getGlobalConfigPath(), "--userconfig", config.getUserConfigPath(), "install"]
         installArgs.push(...Array.from(this.getNpmBuildFlags() || []))
+
         if (options.argv.silent) {
             installArgs.push("--silent")
         }
+
         if (options.argv.quiet) {
             installArgs.push("--quiet")
         }
+
         if (options.argv.production) {
             installArgs.push("--production")
         }
 
         fs.makeTreeSync(this.atomDirectory)
-
         const env = { ...process.env, HOME: this.atomNodeDirectory, RUSTUP_HOME: config.getRustupHomeDirPath() }
         this.addBuildEnvVars(env)
+        const installOptions = {
+            env,
+        }
 
-        const installOptions = { env }
         if (options.cwd) {
             installOptions.cwd = options.cwd
         }
+
         if (this.verbose) {
             installOptions.streaming = true
         }
 
         return this.fork(this.atomNpmPath, installArgs, installOptions, callback)
-    }
-
-    // Request package information from the atom.io API for a given package name.
+    } // Request package information from the atom.io API for a given package name.
     //
     // packageName - The string name of the package to request.
     // callback - The function to invoke when the request completes with an error
     //            as the first argument and an object as the second.
+
     requestPackage(packageName, callback) {
         const requestSettings = {
             url: `${config.getAtomPackagesUrl()}/${packageName}`,
@@ -245,11 +269,14 @@ Run apm -v after installing Git to see what version has been detected.\
         }
         return request.get(requestSettings, function (error, response, body = {}) {
             let message
+
             if (error != null) {
                 message = `Request for package information failed: ${error.message}`
+
                 if (error.code) {
                     message += ` (${error.code})`
                 }
+
                 return callback(message)
             } else if (response.statusCode !== 200) {
                 message = request.getErrorMessage(response, body)
@@ -262,12 +289,11 @@ Run apm -v after installing Git to see what version has been detected.\
                 }
             }
         })
-    }
-
-    // Is the package at the specified version already installed?
+    } // Is the package at the specified version already installed?
     //
     //  * packageName: The string name of the package.
     //  * packageVersion: The string version of the package.
+
     isPackageInstalled(packageName, packageVersion) {
         try {
             let left
@@ -276,9 +302,7 @@ Run apm -v after installing Git to see what version has been detected.\
         } catch (error) {
             return false
         }
-    }
-
-    // Install the package with the given name and optional version
+    } // Install the package with the given name and optional version
     //
     // metadata - The package metadata object with at least a name key. A version
     //            key is also supported. The version defaults to the latest if
@@ -286,11 +310,12 @@ Run apm -v after installing Git to see what version has been detected.\
     // options - The installation options object.
     // callback - The function to invoke when installation completes with an
     //            error as the first argument.
+
     installRegisteredPackage(metadata, options, callback) {
         const packageName = metadata.name
         let packageVersion = metadata.version
-
         const installGlobally = options.installGlobally != null ? options.installGlobally : true
+
         if (!installGlobally) {
             if (packageVersion && this.isPackageInstalled(packageName, packageVersion)) {
                 callback(null, {})
@@ -299,11 +324,14 @@ Run apm -v after installing Git to see what version has been detected.\
         }
 
         let label = packageName
+
         if (packageVersion) {
             label += `@${packageVersion}`
         }
+
         if (!options.argv.json) {
             process.stdout.write(`Installing ${label} `)
+
             if (installGlobally) {
                 process.stdout.write(`to ${this.atomPackagesDirectory} `)
             }
@@ -314,16 +342,20 @@ Run apm -v after installing Git to see what version has been detected.\
                 this.logFailure()
                 return callback(error)
             } else {
+                var _pack$versions$packag, _pack$versions$packag2
+
                 if (packageVersion == null) {
                     packageVersion = this.getLatestCompatibleVersion(pack)
                 }
+
                 if (!packageVersion) {
                     this.logFailure()
                     callback(`No available version compatible with the installed Atom version: ${this.installedAtomVersion}`)
                     return
                 }
 
-                const { tarball } = pack.versions[packageVersion]?.dist != null ? pack.versions[packageVersion]?.dist : {}
+                const { tarball } = ((_pack$versions$packag = pack.versions[packageVersion]) === null || _pack$versions$packag === void 0 ? void 0 : _pack$versions$packag.dist) != null ? ((_pack$versions$packag2 = pack.versions[packageVersion]) === null || _pack$versions$packag2 === void 0 ? void 0 : _pack$versions$packag2.dist) : {}
+
                 if (!tarball) {
                     this.logFailure()
                     callback(`Package version: ${packageVersion} not found`)
@@ -332,17 +364,27 @@ Run apm -v after installing Git to see what version has been detected.\
 
                 const commands = []
                 commands.push((next) => this.installModule(options, pack, tarball, next))
-                if (installGlobally && packageName.localeCompare(pack.name, "en", { sensitivity: "accent" }) !== 0) {
+
+                if (
+                    installGlobally &&
+                    packageName.localeCompare(pack.name, "en", {
+                        sensitivity: "accent",
+                    }) !== 0
+                ) {
                     commands.push((newPack, next) => {
                         // package was renamed; delete old package folder
                         fs.removeSync(path.join(this.atomPackagesDirectory, packageName))
                         return next(null, newPack)
                     })
                 }
+
                 commands.push(function ({ installPath }, next) {
                     if (installPath != null) {
                         metadata = JSON.parse(fs.readFileSync(path.join(installPath, "package.json"), "utf8"))
-                        const json = { installPath, metadata }
+                        const json = {
+                            installPath,
+                            metadata,
+                        }
                         return next(null, json)
                     } else {
                         return next(null, {})
@@ -359,30 +401,40 @@ Run apm -v after installing Git to see what version has been detected.\
                             }
                         }
                     }
+
                     return callback(error, json)
                 })
             }
         })
-    }
-
-    // Install the package with the given name and local path
+    } // Install the package with the given name and local path
     //
     // packageName - The name of the package
     // packagePath - The local path of the package in the form "file:./packages/package-name"
     // options     - The installation options object.
     // callback    - The function to invoke when installation completes with an
     //               error as the first argument.
+
     installLocalPackage(packageName, packagePath, options, callback) {
         if (!options.argv.json) {
             process.stdout.write(`Installing ${packageName} from ${packagePath.slice("file:".length)} `)
             const commands = []
             commands.push((next) => {
-                return this.installModule(options, { name: packageName }, packagePath, next)
+                return this.installModule(
+                    options,
+                    {
+                        name: packageName,
+                    },
+                    packagePath,
+                    next
+                )
             })
             commands.push(function ({ installPath }, next) {
                 if (installPath != null) {
                     const metadata = JSON.parse(fs.readFileSync(path.join(installPath, "package.json"), "utf8"))
-                    const json = { installPath, metadata }
+                    const json = {
+                        installPath,
+                        metadata,
+                    }
                     return next(null, json)
                 } else {
                     return next(null, {})
@@ -397,28 +449,37 @@ Run apm -v after installing Git to see what version has been detected.\
                         this.logSuccess()
                     }
                 }
+
                 return callback(error, json)
             })
         }
-    }
-
-    // Install all the package dependencies found in the package.json file.
+    } // Install all the package dependencies found in the package.json file.
     //
     // options - The installation options
     // callback - The callback function to invoke when done with an error as the
     //            first argument.
+
     installPackageDependencies(options, callback) {
         options = { ...options, installGlobally: false }
         const commands = []
         const object = this.getPackageDependencies()
+
         for (const name in object) {
             const version = object[name]
+
             ;((name, version) => {
                 return commands.push((next) => {
                     if (this.repoLocalPackagePathRegex.test(version)) {
                         return this.installLocalPackage(name, version, options, next)
                     } else {
-                        return this.installRegisteredPackage({ name, version }, options, next)
+                        return this.installRegisteredPackage(
+                            {
+                                name,
+                                version,
+                            },
+                            options,
+                            next
+                        )
                     }
                 })
             })(name, version)
@@ -432,11 +493,9 @@ Run apm -v after installing Git to see what version has been detected.\
         const commands = []
         commands.push((callback) => this.installModules(options, callback))
         commands.push((callback) => this.installPackageDependencies(options, callback))
-
         return asyncLib.waterfall(commands, callback)
-    }
+    } // Get all package dependency names and versions from the package.json file.
 
-    // Get all package dependency names and versions from the package.json file.
     getPackageDependencies() {
         try {
             let left
@@ -446,18 +505,20 @@ Run apm -v after installing Git to see what version has been detected.\
             if (!packageDependencies) {
                 return {}
             }
+
             if (!dependencies) {
                 return packageDependencies
-            }
-
-            // This code filters out any `packageDependencies` that have an equivalent
+            } // This code filters out any `packageDependencies` that have an equivalent
             // normalized repo-local package path entry in the `dependencies` section of
             // `package.json`.  Versioned `packageDependencies` are always returned.
+
             const filteredPackages = {}
+
             for (const packageName in packageDependencies) {
                 const packageSpec = packageDependencies[packageName]
                 const dependencyPath = this.getRepoLocalPackagePath(dependencies[packageName])
                 const packageDependencyPath = this.getRepoLocalPackagePath(packageSpec)
+
                 if (!packageDependencyPath || dependencyPath !== packageDependencyPath) {
                     filteredPackages[packageName] = packageSpec
                 }
@@ -473,7 +534,9 @@ Run apm -v after installing Git to see what version has been detected.\
         if (!packageSpec) {
             return undefined
         }
+
         const repoLocalPackageMatch = packageSpec.match(this.repoLocalPackagePathRegex)
+
         if (repoLocalPackageMatch) {
             return path.normalize(repoLocalPackageMatch[1])
         } else {
@@ -485,30 +548,27 @@ Run apm -v after installing Git to see what version has been detected.\
         fs.makeTreeSync(this.atomDirectory)
         fs.makeTreeSync(this.atomPackagesDirectory)
         return fs.makeTreeSync(this.atomNodeDirectory)
-    }
-
-    // Compile a sample native module to see if a useable native build toolchain
+    } // Compile a sample native module to see if a useable native build toolchain
     // is instlalled and successfully detected. This will include both Python
     // and a compiler.
+
     checkNativeBuildTools(callback) {
         process.stdout.write("Checking for native build tools ")
-
         const buildArgs = ["--globalconfig", config.getGlobalConfigPath(), "--userconfig", config.getUserConfigPath(), "build"]
         buildArgs.push(path.resolve(__dirname, "..", "native-module"))
         buildArgs.push(...Array.from(this.getNpmBuildFlags() || []))
-
         fs.makeTreeSync(this.atomDirectory)
-
         const env = { ...process.env, HOME: this.atomNodeDirectory, RUSTUP_HOME: config.getRustupHomeDirPath() }
         this.addBuildEnvVars(env)
+        const buildOptions = {
+            env,
+        }
 
-        const buildOptions = { env }
         if (this.verbose) {
             buildOptions.streaming = true
         }
 
         fs.removeSync(path.resolve(__dirname, "..", "native-module", "build"))
-
         return this.fork(this.atomNpmPath, buildArgs, buildOptions, (...args) => {
             return this.logCommandResults(callback, ...Array.from(args))
         })
@@ -536,7 +596,6 @@ Run apm -v after installing Git to see what version has been detected.\
 
     warmCompileCache(packageName, callback) {
         const packageDirectory = path.join(this.atomPackagesDirectory, packageName)
-
         return this.getResourcePath((resourcePath) => {
             try {
                 const CompileCache = require(path.join(resourcePath, "src", "compile-cache"))
@@ -555,20 +614,24 @@ Run apm -v after installing Git to see what version has been detected.\
             } catch (error) {
                 // ignore error
             }
+
             return callback(null)
         })
     }
 
     isBundledPackage(packageName, callback) {
         return this.getResourcePath(function (resourcePath) {
+            var _atomMetadata, _atomMetadata$package
+
             let atomMetadata
+
             try {
                 atomMetadata = JSON.parse(fs.readFileSync(path.join(resourcePath, "package.json")))
             } catch (error) {
                 return callback(false)
             }
 
-            return callback(atomMetadata?.packageDependencies?.hasOwnProperty(packageName))
+            return callback((_atomMetadata = atomMetadata) === null || _atomMetadata === void 0 ? void 0 : (_atomMetadata$package = _atomMetadata.packageDependencies) === null || _atomMetadata$package === void 0 ? void 0 : _atomMetadata$package.hasOwnProperty(packageName))
         })
     }
 
@@ -583,22 +646,30 @@ Run apm -v after installing Git to see what version has been detected.\
 
         let latestVersion = null
         const object = pack.versions != null ? pack.versions : {}
+
         for (const version in object) {
+            var _metadata$engines, _metadata$engines2
+
             const metadata = object[version]
+
             if (!semver.valid(version)) {
                 continue
             }
+
             if (!metadata) {
                 continue
             }
+
             if (isDeprecatedPackage(pack.name, version)) {
                 continue
             }
 
-            const engine = metadata.engines?.atom != null ? metadata.engines?.atom : "*"
+            const engine = ((_metadata$engines = metadata.engines) === null || _metadata$engines === void 0 ? void 0 : _metadata$engines.atom) != null ? ((_metadata$engines2 = metadata.engines) === null || _metadata$engines2 === void 0 ? void 0 : _metadata$engines2.atom) : "*"
+
             if (!semver.validRange(engine)) {
                 continue
             }
+
             if (!semver.satisfies(this.installedAtomVersion, engine)) {
                 continue
             }
@@ -606,6 +677,7 @@ Run apm -v after installing Git to see what version has been detected.\
             if (latestVersion == null) {
                 latestVersion = version
             }
+
             if (semver.gt(version, latestVersion)) {
                 latestVersion = version
             }
@@ -620,25 +692,20 @@ Run apm -v after installing Git to see what version has been detected.\
 
     installGitPackage(packageUrl, options, callback) {
         const tasks = []
-
         const cloneDir = temp.mkdirSync("atom-git-package-clone-")
-
         tasks.push((data, next) => {
             const urls = this.getNormalizedGitUrls(packageUrl)
             return this.cloneFirstValidGitUrl(urls, cloneDir, options, (err) => next(err, data))
         })
-
         tasks.push((data, next) => {
             return this.installGitPackageDependencies(cloneDir, options, (err) => next(err, data))
         })
-
         tasks.push((data, next) => {
             return this.getRepositoryHeadSha(cloneDir, function (err, sha) {
                 data.sha = sha
                 return next(err, data)
             })
         })
-
         tasks.push(function (data, next) {
             const metadataFilePath = CSON.resolve(path.join(cloneDir, "package"))
             return CSON.readFile(metadataFilePath, function (err, metadata) {
@@ -647,7 +714,6 @@ Run apm -v after installing Git to see what version has been detected.\
                 return next(err, data)
             })
         })
-
         tasks.push(function (data, next) {
             data.metadata.apmInstallSource = {
                 type: "git",
@@ -656,13 +722,14 @@ Run apm -v after installing Git to see what version has been detected.\
             }
             return CSON.writeFile(data.metadataFilePath, data.metadata, (err) => next(err, data))
         })
-
         tasks.push((data, next) => {
             const { name } = data.metadata
             const targetDir = path.join(this.atomPackagesDirectory, name)
+
             if (!options.argv.json) {
                 process.stdout.write(`Moving ${name} to ${targetDir} `)
             }
+
             return cp(cloneDir, targetDir, (err) => {
                 if (err) {
                     return next(err)
@@ -670,13 +737,18 @@ Run apm -v after installing Git to see what version has been detected.\
                     if (!options.argv.json) {
                         this.logSuccess()
                     }
-                    const json = { installPath: targetDir, metadata: data.metadata }
+
+                    const json = {
+                        installPath: targetDir,
+                        metadata: data.metadata,
+                    }
                     return next(null, json)
                 }
             })
         })
 
         const iteratee = (currentData, task, next) => task(currentData, next)
+
         return asyncLib.reduce(tasks, {}, iteratee, callback)
     }
 
@@ -715,14 +787,9 @@ Run apm -v after installing Git to see what version has been detected.\
     cloneNormalizedUrl(url, cloneDir, options, callback) {
         // Require here to avoid circular dependency
         const Develop = require("./develop")
+
         const develop = new Develop()
-
         return develop.cloneRepository(url, cloneDir, options, (err) => callback(err))
-    }
-
-    installGitPackageDependencies = (directory, options, callback) => {
-        options.cwd = directory
-        return this.installDependencies(options, callback)
     }
 
     getRepositoryHeadSha(repoDir, callback) {
@@ -739,7 +806,6 @@ Run apm -v after installing Git to see what version has been detected.\
         let packageNames
         options = this.parseOptions(options.commandArgs)
         const packagesFilePath = options.argv["packages-file"]
-
         this.createAtomDirectories()
 
         if (options.argv.check) {
@@ -753,6 +819,7 @@ Run apm -v after installing Git to see what version has been detected.\
         }
 
         this.verbose = options.argv.verbose
+
         if (this.verbose) {
             request.debug(true)
             process.env.NODE_DEBUG = "request"
@@ -769,6 +836,7 @@ Run apm -v after installing Git to see what version has been detected.\
                 // is registered package
                 let version
                 const atIndex = name.indexOf("@")
+
                 if (atIndex > 0) {
                     version = name.substring(atIndex + 1)
                     name = name.substring(0, atIndex)
@@ -784,7 +852,15 @@ with Atom will be used.\
 `.yellow
                         )
                     }
-                    return this.installRegisteredPackage({ name, version }, options, nextInstallStep)
+
+                    return this.installRegisteredPackage(
+                        {
+                            name,
+                            version,
+                        },
+                        options,
+                        nextInstallStep
+                    )
                 })
             }
         }
@@ -798,6 +874,7 @@ with Atom will be used.\
             }
         } else {
             packageNames = this.packageNamesFromArgv(options.argv)
+
             if (packageNames.length === 0) {
                 packageNames.push(".")
             }
@@ -812,16 +889,21 @@ with Atom will be used.\
         })
         commands.push((cb) => this.loadInstalledAtomMetadata(() => cb()))
         packageNames.forEach((packageName) => commands.push((cb) => installPackage(packageName, cb)))
+
         const iteratee = (item, next) => item(next)
+
         return asyncLib.mapSeries(commands, iteratee, function (err, installedPackagesInfo) {
             if (err) {
                 return callback(err)
             }
+
             installedPackagesInfo = _.compact(installedPackagesInfo)
             installedPackagesInfo = installedPackagesInfo.filter((item, idx) => packageNames[idx] !== ".")
+
             if (options.argv.json) {
                 console.log(JSON.stringify(installedPackagesInfo, null, "  "))
             }
+
             return callback(null)
         })
     }

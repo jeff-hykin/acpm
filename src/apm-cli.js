@@ -5,27 +5,28 @@ const npm = require("npm")
 const yargs = require("yargs")
 const wordwrap = require("wordwrap")
 const fs = require("fysh")
-
 require("asar-require")
 const config = require("./apm")
 const git = require("./git")
 
 function setupTempDirectory() {
     const temp = require("temp")
-    let tempDirectory = require("os").tmpdir()
-    // Resolve ~ in tmp dir atom/atom#2271
+
+    let tempDirectory = require("os").tmpdir() // Resolve ~ in tmp dir atom/atom#2271
+
     tempDirectory = path.resolve(fs.absolute(tempDirectory))
     temp.dir = tempDirectory
+
     try {
         fs.makeTreeSync(temp.dir)
     } catch (error) {
         // ignore error
     }
+
     return temp.track()
 }
 
 setupTempDirectory()
-
 const ciClass = () => require("./ci")
 const cleanClass = () => require("./clean")
 const configClass = () => require("./config")
@@ -54,7 +55,6 @@ const unpublishClass = () => require("./unpublish")
 const unstarClass = () => require("./unstar")
 const upgradeClass = () => require("./upgrade")
 const viewClass = () => require("./view")
-
 const commands = {
     ci: ciClass,
     clean: cleanClass,
@@ -121,13 +121,16 @@ Run \`apm help <command>\` to see the more details about a specific command.\
     options.alias("h", "help").describe("help", "Print this usage message")
     options.boolean("color").default("color", true).describe("color", "Enable colored output")
     options.command = options.argv._[0]
+
     for (let index = 0; index < args.length; index++) {
         const arg = args[index]
+
         if (arg === options.command) {
             options.commandArgs = args.slice(index + 1)
             break
         }
     }
+
     return options
 }
 
@@ -137,6 +140,7 @@ function showHelp(options) {
     }
 
     let help = options.help()
+
     if (help.indexOf("Options:") >= 0) {
         help += "\n  Prefix an option with `no-` to set it to false such as --no-color to disable"
         help += "\n  colored output."
@@ -150,11 +154,11 @@ function printVersions(args, callback) {
     const apmVersion = (left = require("../package.json").version) != null ? left : ""
     const npmVersion = (left1 = require("npm/package.json").version) != null ? left1 : ""
     const nodeVersion = process.versions.node != null ? process.versions.node : ""
-
     return getPythonVersion((pythonVersion) =>
         git.getGitVersion((gitVersion) =>
             getAtomVersion(function (atomVersion) {
                 let versions
+
                 if (args.json) {
                     versions = {
                         apm: apmVersion,
@@ -165,20 +169,25 @@ function printVersions(args, callback) {
                         git: gitVersion,
                         nodeArch: process.arch,
                     }
+
                     if (config.isWin32()) {
                         versions.visualStudio = config.getInstalledVisualStudioFlag()
                     }
+
                     console.log(JSON.stringify(versions))
                 } else {
                     if (pythonVersion == null) {
                         pythonVersion = ""
                     }
+
                     if (gitVersion == null) {
                         gitVersion = ""
                     }
+
                     if (atomVersion == null) {
                         atomVersion = ""
                     }
+
                     versions = `\
 ${"apm".red}  ${apmVersion.red}
 ${"npm".green}  ${npmVersion.green}
@@ -196,6 +205,7 @@ ${"git".magenta} ${gitVersion.magenta}\
 
                     console.log(versions)
                 }
+
                 return callback()
             })
         )
@@ -205,6 +215,7 @@ ${"git".magenta} ${gitVersion.magenta}\
 function getAtomVersion(callback) {
     return config.getResourcePath(function (resourcePath) {
         const unknownVersion = "unknown"
+
         try {
             let left
             const { version } = (left = require(path.join(resourcePath, "package.json"))) != null ? left : unknownVersion
@@ -223,12 +234,16 @@ function getPythonVersion(callback) {
     return npm.load(npmOptions, function () {
         let left
         let python = (left = npm.config.get("python")) != null ? left : process.env.PYTHON
+
         if (config.isWin32() && !python) {
             let rootDir = process.env.SystemDrive != null ? process.env.SystemDrive : "C:\\"
+
             if (rootDir[rootDir.length - 1] !== "\\") {
                 rootDir += "\\"
             }
+
             const pythonExe = path.resolve(rootDir, "Python27", "python.exe")
+
             if (fs.isFileSync(pythonExe)) {
                 python = pythonExe
             }
@@ -247,16 +262,20 @@ function getPythonVersion(callback) {
         })
         return spawned.on("close", function (code) {
             let version
+
             if (code === 0) {
+                var _version
+
                 ;[, version] = Array.from(Buffer.concat(outputChunks).toString().split(" "))
-                version = version?.trim()
+                version = (_version = version) === null || _version === void 0 ? void 0 : _version.trim()
             }
+
             return callback(version)
         })
     })
 }
 
-var run = module.exports.run = function run(args, callback) {
+var run = (module.exports.run = function run(args, callback) {
     let Command
     config.setupApmRcFile()
     const options = parseOptions(args)
@@ -266,13 +285,17 @@ var run = module.exports.run = function run(args, callback) {
     }
 
     let callbackCalled = false
+
     const handleErrorCallback = (error) => {
         if (callbackCalled) {
             return
         }
+
         callbackCalled = true
+
         if (error != null) {
             let message
+
             if (typeof error === "string") {
                 message = error
             } else {
@@ -286,29 +309,43 @@ var run = module.exports.run = function run(args, callback) {
                 console.error(message.red)
             }
         }
-        return callback?.(error)
+
+        return callback === null || callback === void 0 ? void 0 : callback(error)
     }
 
     args = options.argv
     const { command } = options
+
     if (args.version) {
         return printVersions(args, handleErrorCallback)
     } else if (args.help) {
-        if ((Command = commands[options.command]?.())) {
-            showHelp(new Command().parseOptions?.(options.command))
+        var _commands$options$com
+
+        if ((Command = (_commands$options$com = commands[options.command]) === null || _commands$options$com === void 0 ? void 0 : _commands$options$com.call(commands))) {
+            var _Command$parseOptions, _Command
+
+            showHelp((_Command$parseOptions = (_Command = new Command()).parseOptions) === null || _Command$parseOptions === void 0 ? void 0 : _Command$parseOptions.call(_Command, options.command))
         } else {
             showHelp(options)
         }
+
         return handleErrorCallback()
     } else if (command) {
+        var _commands$command
+
         if (command === "help") {
-            if ((Command = commands[options.commandArgs]?.())) {
-                showHelp(new Command().parseOptions?.(options.commandArgs))
+            var _commands$options$com2
+
+            if ((Command = (_commands$options$com2 = commands[options.commandArgs]) === null || _commands$options$com2 === void 0 ? void 0 : _commands$options$com2.call(commands))) {
+                var _Command$parseOptions2, _Command2
+
+                showHelp((_Command$parseOptions2 = (_Command2 = new Command()).parseOptions) === null || _Command$parseOptions2 === void 0 ? void 0 : _Command$parseOptions2.call(_Command2, options.commandArgs))
             } else {
                 showHelp(options)
             }
+
             return handleErrorCallback()
-        } else if ((Command = commands[command]?.())) {
+        } else if ((Command = (_commands$command = commands[command]) === null || _commands$command === void 0 ? void 0 : _commands$command.call(commands))) {
             return new Command().run(options, handleErrorCallback)
         } else {
             return handleErrorCallback(`Unrecognized command: ${command}`)
@@ -317,4 +354,4 @@ var run = module.exports.run = function run(args, callback) {
         showHelp(options)
         return handleErrorCallback()
     }
-}
+})
