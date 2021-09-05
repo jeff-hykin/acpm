@@ -5,7 +5,13 @@
 if [ "$1" = "install" ] || [ "$1" = "i" ]
 then
     shift 1
-    pnpm install --ignore-workspace-root-check "$@"
+    args="$@"
+    if [ -z "$args" ]
+    then
+        pnpm install
+    else
+        pnpm install --ignore-workspace-root-check "$@"
+    fi
 else
     pnpm "$@"
 fi

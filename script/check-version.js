@@ -9,6 +9,8 @@ if (process.platform === "win32") {
 
 getBundledNodeVersion(bundledNodePath).then(([bundledVersion])=>{
     const ourVersion = process.version
+    console.debug(`ourVersion is:`,ourVersion)
+    console.debug(`bundledVersion is:`,bundledVersion)
 
     if (ourVersion !== bundledVersion) {
         console.error(`System node (${ourVersion}) does not match bundled node (${bundledVersion}).`)
