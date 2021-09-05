@@ -3,7 +3,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("command help", function () {
   beforeEach(function () {
@@ -18,9 +18,9 @@ describe("command help", function () {
 
       waitsFor("waiting for help to complete", 60000, () => callback.callCount === 1)
 
-      runs(function () {
+      return runs(function () {
         expect(console.error.callCount).toBeGreaterThan(0)
-        expect(callback.mostRecentCall.args[0]).toBeUndefined()
+        return expect(callback.mostRecentCall.args[0]).toBeUndefined()
       })
     }))
 
@@ -31,9 +31,9 @@ describe("command help", function () {
 
       waitsFor("waiting for help to complete", 60000, () => callback.callCount === 1)
 
-      runs(function () {
+      return runs(function () {
         expect(console.error.callCount).toBeGreaterThan(0)
-        expect(callback.mostRecentCall.args[0]).toBeUndefined()
+        return expect(callback.mostRecentCall.args[0]).toBeUndefined()
       })
     }))
 
@@ -44,22 +44,22 @@ describe("command help", function () {
 
       waitsFor("waiting for help to complete", 60000, () => callback.callCount === 1)
 
-      runs(function () {
+      return runs(function () {
         expect(console.error.callCount).toBeGreaterThan(0)
-        expect(callback.mostRecentCall.args[0]).toBeUndefined()
+        return expect(callback.mostRecentCall.args[0]).toBeUndefined()
       })
     }))
 
-  describe("apm", () =>
+  return describe("apm", () =>
     it("displays the help for apm", function () {
       const callback = jasmine.createSpy("callback")
       apm.run([], callback)
 
       waitsFor("waiting for help to complete", 60000, () => callback.callCount === 1)
 
-      runs(function () {
+      return runs(function () {
         expect(console.error.callCount).toBeGreaterThan(0)
-        expect(callback.mostRecentCall.args[0]).toBeUndefined()
+        return expect(callback.mostRecentCall.args[0]).toBeUndefined()
       })
     }))
 })

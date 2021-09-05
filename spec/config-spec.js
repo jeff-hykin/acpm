@@ -7,7 +7,7 @@
 const path = require("path")
 const fs = require("fs-plus")
 const temp = require("temp")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm config", function () {
   let [atomHome, userConfigPath] = Array.from([])
@@ -31,10 +31,12 @@ describe("apm config", function () {
 
       waitsFor("waiting for config get to complete", 600000, () => callback.callCount === 1)
 
-      runs(() => expect(process.stdout.write.argsForCall[0][0].trim()).toBe(path.join(process.env.ATOM_HOME, ".apm")))
+      return runs(() =>
+        expect(process.stdout.write.argsForCall[0][0].trim()).toBe(path.join(process.env.ATOM_HOME, ".apm"))
+      )
     }))
 
-  describe("apm config set", () =>
+  return describe("apm config set", () =>
     it("sets the value in the user config", function () {
       expect(fs.isFileSync(userConfigPath)).toBe(false)
 
@@ -47,11 +49,11 @@ describe("apm config", function () {
         expect(fs.isFileSync(userConfigPath)).toBe(true)
 
         callback.reset()
-        apm.run(["config", "get", "foo"], callback)
+        return apm.run(["config", "get", "foo"], callback)
       })
 
       waitsFor("waiting for config get to complete", 600000, () => callback.callCount === 1)
 
-      runs(() => expect(process.stdout.write.argsForCall[0][0].trim()).toBe("bar"))
+      return runs(() => expect(process.stdout.write.argsForCall[0][0].trim()).toBe("bar"))
     }))
 })

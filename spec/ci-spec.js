@@ -11,7 +11,7 @@ const temp = require("temp")
 const express = require("express")
 const wrench = require("wrench")
 const CSON = require("season")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm ci", function () {
   let [atomHome, resourcePath, server] = Array.from([])
@@ -73,13 +73,13 @@ describe("apm ci", function () {
       process.env.npm_config_registry = "http://localhost:3000/"
       return (live = true)
     })
-    waitsFor(() => live)
+    return waitsFor(() => live)
   })
 
   afterEach(function () {
     let done = false
     server.close(() => (done = true))
-    waitsFor(() => done)
+    return waitsFor(() => done)
   })
 
   it("installs dependency versions as specified by the lockfile", function () {
@@ -91,22 +91,18 @@ describe("apm ci", function () {
     apm.run(["ci"], callback)
     waitsFor("waiting for install to complete", 600000, () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(callback.mostRecentCall.args[0]).toBeNull()
 
       const pjson0 = CSON.readFileSync(path.join("node_modules", "test-module-with-dependencies", "package.json"))
       expect(pjson0.version).toBe("1.1.0")
 
       const pjson1 = CSON.readFileSync(path.join("node_modules", "test-module", "package.json"))
-      expect(pjson1.version).toBe("1.1.0")
+      return expect(pjson1.version).toBe("1.1.0")
     })
   })
 
   it("builds a native dependency correctly", function () {
-    if (process.platform === "win32") {
-      console.warn("Test skipped on windows") // TODO
-      return
-    }
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module-with-native")
     wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
     process.chdir(moduleDirectory)
@@ -124,14 +120,14 @@ describe("apm ci", function () {
 
     runs(function () {
       expect(callback0.mostRecentCall.args[0]).toBeNull()
-      apm.run(["ci"], callback1)
+      return apm.run(["ci"], callback1)
     })
 
     waitsFor("waiting for ci to complete", 600000, () => callback1.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(callback1.mostRecentCall.args[0]).toBeNull()
-      expect(
+      return expect(
         fs.existsSync(path.join(moduleDirectory, "node_modules", "native-module", "build", "Release", "native.node"))
       ).toBeTruthy()
     })
@@ -146,10 +142,10 @@ describe("apm ci", function () {
     apm.run(["ci"], callback)
     waitsFor("waiting for install to complete", 600000, () => callback.callCount > 0)
 
-    runs(() => expect(callback.mostRecentCall.args[0]).not.toBeNull())
+    return runs(() => expect(callback.mostRecentCall.args[0]).not.toBeNull())
   })
 
-  it("fails if the lockfile is out of date", function () {
+  return it("fails if the lockfile is out of date", function () {
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module-with-lockfile")
     wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
     process.chdir(moduleDirectory)
@@ -163,6 +159,6 @@ describe("apm ci", function () {
     apm.run(["ci"], callback)
     waitsFor("waiting for install to complete", 600000, () => callback.callCount > 0)
 
-    runs(() => expect(callback.mostRecentCall.args[0]).not.toBeNull())
+    return runs(() => expect(callback.mostRecentCall.args[0]).not.toBeNull())
   })
 })

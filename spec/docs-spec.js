@@ -7,7 +7,7 @@ const path = require("path")
 const express = require("express")
 const http = require("http")
 const apm = require("../lib/apm-cli")
-import Docs from "../lib/docs"
+let Docs = require("../lib/docs")
 
 describe("apm docs", function () {
   let server = null
@@ -28,13 +28,13 @@ describe("apm docs", function () {
       process.env.ATOM_PACKAGES_URL = "http://localhost:3000"
       return (live = true)
     })
-    waitsFor(() => live)
+    return waitsFor(() => live)
   })
 
   afterEach(function () {
     let done = false
     server.close(() => (done = true))
-    waitsFor(() => done)
+    return waitsFor(() => done)
   })
 
   it("logs an error if the package has no URL", function () {
@@ -42,9 +42,9 @@ describe("apm docs", function () {
     apm.run(["docs", "install"], callback)
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
-    runs(function () {
+    return runs(function () {
       expect(console.error).toHaveBeenCalled()
-      expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
+      return expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
     })
   })
 
@@ -54,9 +54,9 @@ describe("apm docs", function () {
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(console.error).toHaveBeenCalled()
-      expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
+      return expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
     })
   })
 
@@ -67,34 +67,35 @@ describe("apm docs", function () {
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(Docs.prototype.openRepositoryUrl).not.toHaveBeenCalled()
       expect(console.log).toHaveBeenCalled()
-      expect(console.log.argsForCall[0][0]).toContain("https://github.com/atom/wrap-guide")
+      return expect(console.log.argsForCall[0][0]).toContain("https://github.com/atom/wrap-guide")
     })
   })
 
   it("prints the package URL if called with the -p short option (and does not open it)", function () {
+    Docs = require("../lib/docs")
     spyOn(Docs.prototype, "openRepositoryUrl")
     const callback = jasmine.createSpy("callback")
     apm.run(["docs", "-p", "wrap-guide"], callback)
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(Docs.prototype.openRepositoryUrl).not.toHaveBeenCalled()
       expect(console.log).toHaveBeenCalled()
-      expect(console.log.argsForCall[0][0]).toContain("https://github.com/atom/wrap-guide")
+      return expect(console.log.argsForCall[0][0]).toContain("https://github.com/atom/wrap-guide")
     })
   })
 
-  it("opens the package URL", function () {
+  return it("opens the package URL", function () {
     spyOn(Docs.prototype, "openRepositoryUrl")
     const callback = jasmine.createSpy("callback")
     apm.run(["docs", "wrap-guide"], callback)
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(() => expect(Docs.prototype.openRepositoryUrl).toHaveBeenCalled())
+    return runs(() => expect(Docs.prototype.openRepositoryUrl).toHaveBeenCalled())
   })
 })

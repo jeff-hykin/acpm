@@ -10,7 +10,7 @@ const temp = require("temp")
 const express = require("express")
 const http = require("http")
 const wrench = require("wrench")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm clean", function () {
   let [moduleDirectory, server] = Array.from([])
@@ -59,13 +59,13 @@ describe("apm clean", function () {
       process.chdir(moduleDirectory)
       return (live = true)
     })
-    waitsFor(() => live)
+    return waitsFor(() => live)
   })
 
   afterEach(function () {
     let done = false
     server.close(() => (done = true))
-    waitsFor(() => done)
+    return waitsFor(() => done)
   })
 
   it("uninstalls any packages not referenced in the package.json", function () {
@@ -82,13 +82,13 @@ describe("apm clean", function () {
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(callback.mostRecentCall.args[0]).toBeUndefined()
-      expect(fs.existsSync(removedPath)).toBeFalsy()
+      return expect(fs.existsSync(removedPath)).toBeFalsy()
     })
   })
 
-  it("uninstalls a scoped package", function () {
+  return it("uninstalls a scoped package", function () {
     const removedPath = path.join(moduleDirectory, "node_modules/@types/atom")
     fs.makeTreeSync(removedPath)
     fs.writeFileSync(
@@ -102,9 +102,9 @@ describe("apm clean", function () {
 
     waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(callback.mostRecentCall.args[0]).toBeUndefined()
-      expect(fs.existsSync(removedPath)).toBeFalsy()
+      return expect(fs.existsSync(removedPath)).toBeFalsy()
     })
   })
 })

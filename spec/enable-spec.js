@@ -7,12 +7,12 @@ const path = require("path")
 const temp = require("temp")
 const CSON = require("season")
 
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm enable", function () {
   beforeEach(function () {
     spyOnConsole()
-    spyOnToken()
+    return spyOnToken()
   })
 
   it("enables a disabled package", function () {
@@ -33,13 +33,13 @@ describe("apm enable", function () {
 
     waitsFor("waiting for enable to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(console.log).toHaveBeenCalled()
       expect(console.log.argsForCall[0][0]).toMatch(/Not Disabled:\s*not-installed/)
       expect(console.log.argsForCall[1][0]).toMatch(/Enabled:\s*vim-mode/)
 
       const config = CSON.readFileSync(configFilePath)
-      expect(config).toEqual({
+      return expect(config).toEqual({
         "*": {
           core: {
             disabledPackages: ["metrics", "exception-reporting"],
@@ -67,12 +67,12 @@ describe("apm enable", function () {
 
     waitsFor("waiting for enable to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(console.log).toHaveBeenCalled()
       expect(console.log.argsForCall[0][0]).toMatch(/Not Disabled:\s*vim-mode/)
 
       const config = CSON.readFileSync(configFilePath)
-      expect(config).toEqual({
+      return expect(config).toEqual({
         "*": {
           core: {
             disabledPackages: ["metrics", "exception-reporting"],
@@ -91,13 +91,13 @@ describe("apm enable", function () {
 
     waitsFor("waiting for enable to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(console.error).toHaveBeenCalled()
-      expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
+      return expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
     })
   })
 
-  it("complains if user supplies no packages", function () {
+  return it("complains if user supplies no packages", function () {
     const atomHome = temp.mkdirSync("apm-home-dir-")
     process.env.ATOM_HOME = atomHome
     const callback = jasmine.createSpy("callback")
@@ -106,9 +106,9 @@ describe("apm enable", function () {
 
     waitsFor("waiting for enable to complete", () => callback.callCount > 0)
 
-    runs(function () {
+    return runs(function () {
       expect(console.error).toHaveBeenCalled()
-      expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
+      return expect(console.error.argsForCall[0][0].length).toBeGreaterThan(0)
     })
   })
 })

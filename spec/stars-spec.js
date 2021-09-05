@@ -9,7 +9,7 @@ const express = require("express")
 const fs = require("fs-plus")
 const http = require("http")
 const temp = require("temp")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm stars", function () {
   let [atomHome, server] = Array.from([])
@@ -63,13 +63,13 @@ describe("apm stars", function () {
       return (live = true)
     })
 
-    waitsFor(() => live)
+    return waitsFor(() => live)
   })
 
   afterEach(function () {
     let closed = false
     server.close(() => (closed = true))
-    waitsFor(() => closed)
+    return waitsFor(() => closed)
   })
 
   describe("when no user flag is specified", () =>
@@ -79,9 +79,9 @@ describe("apm stars", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(function () {
+      return runs(function () {
         expect(console.log).toHaveBeenCalled()
-        expect(console.log.argsForCall[1][0]).toContain("beverly-hills")
+        return expect(console.log.argsForCall[1][0]).toContain("beverly-hills")
       })
     }))
 
@@ -92,9 +92,9 @@ describe("apm stars", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(function () {
+      return runs(function () {
         expect(console.log).toHaveBeenCalled()
-        expect(console.log.argsForCall[1][0]).toContain("test-module")
+        return expect(console.log.argsForCall[1][0]).toContain("test-module")
       })
     }))
 
@@ -107,24 +107,24 @@ describe("apm stars", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(function () {
+      return runs(function () {
         expect(callback.mostRecentCall.args[0]).toBeNull()
         expect(fs.existsSync(path.join(testModuleDirectory, "index.js"))).toBeTruthy()
-        expect(fs.existsSync(path.join(testModuleDirectory, "package.json"))).toBeTruthy()
+        return expect(fs.existsSync(path.join(testModuleDirectory, "package.json"))).toBeTruthy()
       })
     }))
 
-  describe("when the theme flag is specified", () =>
+  return describe("when the theme flag is specified", () =>
     it("only lists themes", function () {
       const callback = jasmine.createSpy("callback")
       apm.run(["stars", "--themes"], callback)
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(function () {
+      return runs(function () {
         expect(console.log).toHaveBeenCalled()
         expect(console.log.argsForCall[1][0]).toContain("duckblur")
-        expect(console.log.argsForCall[1][0]).not.toContain("beverly-hills")
+        return expect(console.log.argsForCall[1][0]).not.toContain("beverly-hills")
       })
     }))
 })

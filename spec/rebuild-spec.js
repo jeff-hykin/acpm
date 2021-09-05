@@ -8,7 +8,7 @@ const path = require("path")
 const temp = require("temp")
 const express = require("express")
 const http = require("http")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 describe("apm rebuild", function () {
   let [server, originalPathEnv] = Array.from([])
@@ -49,7 +49,7 @@ describe("apm rebuild", function () {
       process.env.PATH = ""
       return (live = true)
     })
-    waitsFor(() => live)
+    return waitsFor(() => live)
   })
 
   afterEach(function () {
@@ -57,7 +57,7 @@ describe("apm rebuild", function () {
 
     let done = false
     server.close(() => (done = true))
-    waitsFor(() => done)
+    return waitsFor(() => done)
   })
 
   it("rebuilds all modules when no module names are specified", function () {
@@ -69,10 +69,10 @@ describe("apm rebuild", function () {
 
     waitsFor("waiting for rebuild to complete", 600000, () => callback.callCount === 1)
 
-    runs(() => expect(callback.mostRecentCall.args[0]).toBeUndefined())
+    return runs(() => expect(callback.mostRecentCall.args[0]).toBeUndefined())
   })
 
-  it("rebuilds the specified modules", function () {
+  return it("rebuilds the specified modules", function () {
     const packageToRebuild = path.join(__dirname, "fixtures/package-with-native-deps")
 
     process.chdir(packageToRebuild)
@@ -81,6 +81,6 @@ describe("apm rebuild", function () {
 
     waitsFor("waiting for rebuild to complete", 600000, () => callback.callCount === 1)
 
-    runs(() => expect(callback.mostRecentCall.args[0]).toBeUndefined())
+    return runs(() => expect(callback.mostRecentCall.args[0]).toBeUndefined())
   })
 })

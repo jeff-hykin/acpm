@@ -6,7 +6,7 @@
 const path = require("path")
 const fs = require("fs-plus")
 const temp = require("temp")
-import * as apm from "../lib/apm-cli"
+const apm = require("../lib/apm-cli")
 
 const createPackage = function (packageName, includeDev = false) {
   let devPackagePath
@@ -37,9 +37,9 @@ describe("apm uninstall", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(function () {
+      return runs(function () {
         expect(console.error.mostRecentCall.args[0].length).toBeGreaterThan(0)
-        expect(callback.mostRecentCall.args[0]).not.toBeUndefined()
+        return expect(callback.mostRecentCall.args[0]).not.toBeUndefined()
       })
     }))
 
@@ -50,7 +50,7 @@ describe("apm uninstall", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(() => expect(console.error.callCount).toBe(1))
+      return runs(() => expect(console.error.callCount).toBe(1))
     }))
 
   describe("when the package is installed", () =>
@@ -63,10 +63,10 @@ describe("apm uninstall", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(() => expect(fs.existsSync(packagePath)).toBeFalsy())
+      return runs(() => expect(fs.existsSync(packagePath)).toBeFalsy())
     }))
 
-  describe("when the package folder exists but does not contain a package.json", function () {
+  return describe("when the package folder exists but does not contain a package.json", function () {
     it("does not delete the folder", function () {
       const { packagePath } = createPackage("test-package")
       fs.unlinkSync(path.join(packagePath, "package.json"))
@@ -76,15 +76,11 @@ describe("apm uninstall", function () {
 
       waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-      runs(() => expect(fs.existsSync(packagePath)).toBeTruthy())
+      return runs(() => expect(fs.existsSync(packagePath)).toBeTruthy())
     })
 
     describe("when . is specified as the package name", () =>
       it("resolves to the basename of the cwd", function () {
-        if (process.platform === "win32") {
-          console.warn("Test skipped on windows") // TODO
-          return
-        }
         const { packagePath } = createPackage("test-package")
 
         expect(fs.existsSync(packagePath)).toBeTruthy()
@@ -97,7 +93,7 @@ describe("apm uninstall", function () {
 
         waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-        runs(function () {
+        return runs(function () {
           expect(fs.existsSync(packagePath)).toBeFalsy()
           return process.chdir(oldCwd)
         })
@@ -113,13 +109,13 @@ describe("apm uninstall", function () {
 
         waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-        runs(function () {
+        return runs(function () {
           expect(fs.existsSync(devPackagePath)).toBeFalsy()
-          expect(fs.existsSync(packagePath)).toBeTruthy()
+          return expect(fs.existsSync(packagePath)).toBeTruthy()
         })
       }))
 
-    describe("--hard", () =>
+    return describe("--hard", () =>
       it("deletes the packages from the both packages folders", function () {
         const atomHome = temp.mkdirSync("apm-home-dir-")
         const packagePath = path.join(atomHome, "packages", "test-package")
@@ -136,9 +132,9 @@ describe("apm uninstall", function () {
 
         waitsFor("waiting for command to complete", () => callback.callCount > 0)
 
-        runs(function () {
+        return runs(function () {
           expect(fs.existsSync(devPackagePath)).toBeFalsy()
-          expect(fs.existsSync(packagePath)).toBeFalsy()
+          return expect(fs.existsSync(packagePath)).toBeFalsy()
         })
       }))
   })
