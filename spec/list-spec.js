@@ -6,9 +6,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const path = require("path")
-const fs = require("fs-plus")
 const temp = require("temp")
-const wrench = require("wrench")
+const fs = require("fysh")
 const apm = require("../lib/apm-cli")
 const CSON = require("season")
 
@@ -126,7 +125,7 @@ describe("apm list", function () {
     beforeEach(function () {
       const packagesPath = path.join(atomHome, "packages")
       fs.makeTreeSync(packagesPath)
-      wrench.copyDirSyncRecursive(
+      fs.copySync(
         path.join(__dirname, "fixtures", "test-module"),
         path.join(packagesPath, "test-module")
       )

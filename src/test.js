@@ -7,7 +7,7 @@ import path from "path"
 import yargs from "yargs"
 import temp from "temp"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 
 export default class Test extends Command {
   parseOptions(argv) {

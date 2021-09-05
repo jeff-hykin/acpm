@@ -1,4 +1,4 @@
-const nodeTarget = require("fs")
+const nodeTarget = require("fysh")
   .readFileSync("./.npmrc", "utf8")
   .match(/target=(.*)\n/)[1]
 

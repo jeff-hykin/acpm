@@ -9,7 +9,7 @@ import path from "path"
 import CSON from "season"
 import yargs from "yargs"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 import * as config from "./apm"
 import { tree } from "./tree"
 import { getRepository } from "./packages"
@@ -122,7 +122,7 @@ List all the installed packages and also the packages bundled with Atom.\
 
   listPackages(directoryPath, options) {
     const packages = []
-    for (const child of fs.list(directoryPath)) {
+    for (const child of fs.sync.list(directoryPath)) {
       let manifestPath
       if (!fs.isDirectorySync(path.join(directoryPath, child))) {
         continue

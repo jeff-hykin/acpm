@@ -12,7 +12,7 @@ import CSON from "season"
 import yargs from "yargs"
 import * as config from "./apm"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 import Login from "./login"
 import * as Packages from "./packages"
 import * as request from "./request"
@@ -65,7 +65,7 @@ Run \`apm stars\` to see all your starred packages.\
   getInstalledPackageNames() {
     const installedPackages = []
     const userPackagesDirectory = path.join(config.getAtomDirectory(), "packages")
-    for (const child of fs.list(userPackagesDirectory)) {
+    for (const child of fs.sync.list(userPackagesDirectory)) {
       let manifestPath
       if (!fs.isDirectorySync(path.join(userPackagesDirectory, child))) {
         continue

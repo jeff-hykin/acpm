@@ -10,7 +10,7 @@ import CSON from "season"
 import yargs from "yargs"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 
 export default class Unlink extends Command {
   constructor() {
@@ -61,14 +61,14 @@ Run \`apm links\` to view all the currently linked packages.\
   unlinkAll(options, callback) {
     try {
       let child, packagePath
-      for (child of fs.list(this.devPackagesPath)) {
+      for (child of fs.sync.list(this.devPackagesPath)) {
         packagePath = path.join(this.devPackagesPath, child)
         if (fs.isSymbolicLinkSync(packagePath)) {
           this.unlinkPath(packagePath)
         }
       }
       if (!options.argv.dev) {
-        for (child of fs.list(this.packagesPath)) {
+        for (child of fs.sync.list(this.packagesPath)) {
           packagePath = path.join(this.packagesPath, child)
           if (fs.isSymbolicLinkSync(packagePath)) {
             this.unlinkPath(packagePath)

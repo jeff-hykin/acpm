@@ -6,7 +6,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import child_process from "child_process"
-import fs from "./fs"
+import fs from "fysh"
 import path from "path"
 import npm from "npm"
 let asarPath = null

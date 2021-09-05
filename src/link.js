@@ -10,7 +10,7 @@ import CSON from "season"
 import yargs from "yargs"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 
 export default class Link extends Command {
   parseOptions(argv) {

@@ -6,7 +6,7 @@
  */
 const path = require("path")
 const express = require("express")
-const fs = require("fs-plus")
+const fs = require("fysh")
 const http = require("http")
 const temp = require("temp")
 const apm = require("../lib/apm-cli")

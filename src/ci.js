@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import path from "path"
-import fs from "./fs"
+import fs from "fysh"
 import yargs from "yargs"
 import async from "async"
 import * as config from "./apm"

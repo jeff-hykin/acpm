@@ -17,7 +17,7 @@ import wordwrap from "wordwrap"
 import "asar-require"
 
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 import * as git from "./git"
 
 function setupTempDirectory() {

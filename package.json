@@ -34,8 +34,7 @@
         "async": "^3.2.0",
         "colors": "~1.4.0",
         "first-mate": "^7.4.3",
-        "fs-extra": "^10.0.0",
-        "fs-plus": "3.x",
+        "fysh": "0.2.1",
         "git-utils": "^5.7.3",
         "glob": "^7.1.7",
         "hosted-git-info": "^3.0.8",
@@ -53,7 +52,6 @@
         "tar": "^6.1.0",
         "temp": "^0.9.4",
         "wordwrap": "1.0.0",
-        "wrench": "~1.5.1",
         "yargs": "^3.32.0"
     },
     "devDependencies": {
@@ -76,7 +74,6 @@
         "@types/tar": "^4.0.5",
         "@types/temp": "^0.9.1",
         "@types/wordwrap": "1.0.1",
-        "@types/wrench": "~0.0.29",
         "@types/yargs": "^17.0.0",
         "babel-preset-atomic": "^4.2.0",
         "eslint-config-atomic": "^1.16.2",

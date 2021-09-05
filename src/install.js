@@ -18,7 +18,7 @@ import temp from "temp"
 import hostedGitInfo from "hosted-git-info"
 import * as config from "./apm"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 import RebuildModuleCache from "./rebuild-module-cache"
 import * as request from "./request"
 import { isDeprecatedPackage } from "./deprecated-packages"
@@ -123,7 +123,7 @@ package names to install with optional versions using the
           child = children[0]
           const source = path.join(nodeModulesDirectory, child)
           destination = path.join(this.atomPackagesDirectory, child)
-          commands.push((next) => fs.cp(source, destination, next))
+          commands.push((next) => (fs.sync.cp(source, destination),next()))
           commands.push((next) => this.buildModuleCache(pack.name, next))
           commands.push((next) => this.warmCompileCache(pack.name, next))
 
@@ -677,17 +677,12 @@ Run apm -v after installing Git to see what version has been detected.\
       if (!options.argv.json) {
         process.stdout.write(`Moving ${name} to ${targetDir} `)
       }
-      return fs.cp(cloneDir, targetDir, (err) => {
-        if (err) {
-          return next(err)
-        } else {
-          if (!options.argv.json) {
-            this.logSuccess()
-          }
-          const json = { installPath: targetDir, metadata: data.metadata }
-          return next(null, json)
-        }
-      })
+      fs.sync.cp(cloneDir, targetDir)
+      if (!options.argv.json) {
+        this.logSuccess()
+      }
+      const json = { installPath: targetDir, metadata: data.metadata }
+      return next(null, json)
     })
 
     const iteratee = (currentData, task, next) => task(currentData, next)

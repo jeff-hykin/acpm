@@ -5,11 +5,10 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const path = require("path")
-const fs = require("fs-plus")
+const fs = require("fysh")
 const temp = require("temp")
 const express = require("express")
 const http = require("http")
-const wrench = require("wrench")
 const apm = require("../lib/apm-cli")
 
 describe("apm clean", function () {
@@ -55,7 +54,7 @@ describe("apm clean", function () {
       process.env.npm_config_registry = "http://localhost:3000/"
 
       moduleDirectory = path.join(temp.mkdirSync("apm-test-module-"), "test-module-with-dependencies")
-      wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-dependencies"), moduleDirectory)
+      fs.copySync(path.join(__dirname, "fixtures", "test-module-with-dependencies"), moduleDirectory)
       process.chdir(moduleDirectory)
       return (live = true)
     })

@@ -3,8 +3,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const fs = require("fs-plus")
-const wrench = require("wrench")
+const fs = require("fysh")
 const path = require("path")
 const temp = require("temp")
 const CSON = require("season")
@@ -34,12 +33,12 @@ describe("apm disable", function () {
     const packagesPath = path.join(atomHome, "packages")
     const packageSrcPath = path.join(__dirname, "fixtures")
     fs.makeTreeSync(packagesPath)
-    wrench.copyDirSyncRecursive(path.join(packageSrcPath, "test-module"), path.join(packagesPath, "test-module"))
-    wrench.copyDirSyncRecursive(
+    fs.copySync(path.join(packageSrcPath, "test-module"), path.join(packagesPath, "test-module"))
+    fs.copySync(
       path.join(packageSrcPath, "test-module-two"),
       path.join(packagesPath, "test-module-two")
     )
-    wrench.copyDirSyncRecursive(
+    fs.copySync(
       path.join(packageSrcPath, "test-module-three"),
       path.join(packagesPath, "test-module-three")
     )

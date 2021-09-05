@@ -5,11 +5,10 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const path = require("path")
-const fs = require("fs")
+const fs = require("fysh")
 const http = require("http")
 const temp = require("temp")
 const express = require("express")
-const wrench = require("wrench")
 const CSON = require("season")
 const apm = require("../lib/apm-cli")
 
@@ -84,7 +83,7 @@ describe("apm ci", function () {
 
   it("installs dependency versions as specified by the lockfile", function () {
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module-with-lockfile")
-    wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
+    fs.copySync(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
     process.chdir(moduleDirectory)
 
     const callback = jasmine.createSpy("callback")
@@ -104,7 +103,7 @@ describe("apm ci", function () {
 
   it("builds a native dependency correctly", function () {
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module-with-native")
-    wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
+    fs.copySync(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
     process.chdir(moduleDirectory)
 
     const pjsonPath = path.join(moduleDirectory, "package.json")
@@ -135,7 +134,7 @@ describe("apm ci", function () {
 
   it("fails if the lockfile is not present", function () {
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module")
-    wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module"), moduleDirectory)
+    fs.copySync(path.join(__dirname, "fixtures", "test-module"), moduleDirectory)
     process.chdir(moduleDirectory)
 
     const callback = jasmine.createSpy("callback")
@@ -147,7 +146,7 @@ describe("apm ci", function () {
 
   return it("fails if the lockfile is out of date", function () {
     const moduleDirectory = path.join(temp.mkdirSync("apm-test-"), "test-module-with-lockfile")
-    wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
+    fs.copySync(path.join(__dirname, "fixtures", "test-module-with-lockfile"), moduleDirectory)
     process.chdir(moduleDirectory)
 
     const pjsonPath = path.join(moduleDirectory, "package.json")

@@ -5,7 +5,7 @@
  */
 const path = require("path")
 const temp = require("temp")
-const fs = require("fs")
+const fs = require("fysh")
 const apm = require("../lib/apm-cli")
 
 describe("apm command line interface", function () {

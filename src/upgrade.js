@@ -13,7 +13,7 @@ import semver from "semver"
 import Git from "git-utils"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 import Install from "./install"
 import * as Packages from "./packages"
 import * as request from "./request"
@@ -54,7 +54,7 @@ available updates.\
 
   getInstalledPackages(options) {
     let packages = []
-    for (const name of fs.list(this.atomPackagesDirectory)) {
+    for (const name of fs.sync.list(this.atomPackagesDirectory)) {
       let pack
       if ((pack = this.getIntalledPackage(name))) {
         packages.push(pack)

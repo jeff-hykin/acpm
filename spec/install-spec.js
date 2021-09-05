@@ -6,11 +6,10 @@
  */
 const path = require("path")
 const CSON = require("season")
-const fs = require("../lib/fs")
 const temp = require("temp")
 const express = require("express")
 const http = require("http")
-const wrench = require("wrench")
+const fs = require("fysh")
 const apm = require("../lib/apm-cli")
 const Install = require("../lib/install")
 
@@ -263,7 +262,7 @@ describe("apm install", function () {
     describe("when no path is specified", () =>
       it("installs all dependent modules", function () {
         const moduleDirectory = path.join(temp.mkdirSync("apm-test-module-"), "test-module-with-dependencies")
-        wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-dependencies"), moduleDirectory)
+        fs.copySync(path.join(__dirname, "fixtures", "test-module-with-dependencies"), moduleDirectory)
         process.chdir(moduleDirectory)
         const callback = jasmine.createSpy("callback")
         apm.run(["install"], callback)
@@ -369,7 +368,7 @@ describe("apm install", function () {
         })
         const packageDirectory = path.join(atomRepoPath, "packages", "test-module-with-dependencies")
         fs.makeTreeSync(path.join(atomRepoPath, "packages"))
-        wrench.copyDirSyncRecursive(path.join(__dirname, "fixtures", "test-module-with-dependencies"), packageDirectory)
+        fs.copySync(path.join(__dirname, "fixtures", "test-module-with-dependencies"), packageDirectory)
         const originalPath = process.cwd()
         process.chdir(atomRepoPath)
 

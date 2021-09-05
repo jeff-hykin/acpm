@@ -9,7 +9,7 @@ import async from "async"
 import yargs from "yargs"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 
 export default class RebuildModuleCache extends Command {
   constructor() {
@@ -62,7 +62,7 @@ This command skips all linked packages.\
 
   run(options, callback) {
     const commands = []
-    fs.list(this.atomPackagesDirectory).forEach((packageName) => {
+    fs.sync.list(this.atomPackagesDirectory).forEach((packageName) => {
       const packageDirectory = path.join(this.atomPackagesDirectory, packageName)
       if (fs.isSymbolicLinkSync(packageDirectory)) {
         return

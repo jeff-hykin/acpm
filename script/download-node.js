@@ -1,4 +1,4 @@
-const fs = require('fs-extra')
+const fs = require('fysh')
 const path = require('path')
 const zlib = require("zlib")
 

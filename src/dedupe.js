@@ -9,7 +9,7 @@ import async from "async"
 import yargs from "yargs"
 import * as config from "./apm"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 
 export default class Dedupe extends Command {
   constructor() {

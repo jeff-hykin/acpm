@@ -11,7 +11,7 @@ import yargs from "yargs"
 import * as auth from "./auth"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 import * as request from "./request"
 
 export default class Uninstall extends Command {

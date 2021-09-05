@@ -15,7 +15,7 @@ import plist from "@atom/plist"
 import { ScopeSelector } from "first-mate"
 import tar from "tar"
 import temp from "temp"
-import fs from "./fs"
+import fs from "fysh"
 import * as request from "./request"
 
 // Convert a TextMate bundle to an Atom package

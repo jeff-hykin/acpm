@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const path = require("path")
-const fs = require("fs-plus")
+const fs = require("fysh")
 const temp = require("temp")
 const express = require("express")
 const http = require("http")

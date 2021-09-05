@@ -7,7 +7,7 @@ import path from "path"
 import yargs from "yargs"
 import Command from "./command"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 import { tree } from "./tree"
 
 export default class Links extends Command {
@@ -39,7 +39,7 @@ List all of the symlinked atom packages in ~/.atom/packages and
 
   getSymlinks(directoryPath) {
     const symlinks = []
-    for (const directory of fs.list(directoryPath)) {
+    for (const directory of fs.sync.list(directoryPath)) {
       const symlinkPath = path.join(directoryPath, directory)
       if (fs.isSymbolicLinkSync(symlinkPath)) {
         symlinks.push(symlinkPath)

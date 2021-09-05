@@ -6,7 +6,7 @@
  */
 import path from "path"
 import url from "url"
-import fs from "./fs"
+import fs from "fysh"
 import * as request from "./request"
 import TextMateTheme from "./text-mate-theme"
 

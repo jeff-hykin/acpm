@@ -8,7 +8,7 @@
 import path from "path"
 import yargs from "yargs"
 import Command from "./command"
-import fs from "./fs"
+import fs from "fysh"
 
 const supportedSyntaxes = ["coffeescript", "javascript"]
 
@@ -142,7 +142,7 @@ on the option selected.\
 
     return (() => {
       const result = []
-      for (const childPath of fs.listRecursive(templatePath)) {
+      for (const childPath of fs.sync.listRecursive(templatePath)) {
         const templateChildPath = path.resolve(templatePath, childPath)
         let relativePath = templateChildPath.replace(templatePath, "")
         relativePath = relativePath.replace(/^\//, "")

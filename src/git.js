@@ -11,7 +11,7 @@ import { spawn } from "child_process"
 import path from "path"
 import npm from "npm"
 import * as config from "./apm"
-import fs from "./fs"
+import fs from "fysh"
 
 const addPortableGitToEnv = function (env) {
   let children
