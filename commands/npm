@@ -2,5 +2,10 @@
 
 # summary
     # this is a wrapper to trick everything into using pnpm instead of npm
-
-pnpm "$@"
+if [ "$1" = "install" ] || [ "$1" = "i" ]
+then
+    shift 1
+    pnpm install --ignore-workspace-root-check "$@"
+else
+    pnpm "$@"
+fi
