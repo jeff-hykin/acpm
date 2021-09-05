@@ -1,14 +1,9 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import yargs from "yargs"
-import * as apm from "./apm"
-import Command from "./command"
+const path = require("path")
+const yargs = require("yargs")
+const apm = require("./apm")
+const Command = require("./command")
 
-export default class Config extends Command {
+module.exports  = class Config extends Command {
   constructor() {
     super()
     const atomDirectory = apm.getAtomDirectory()

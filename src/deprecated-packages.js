@@ -1,14 +1,7 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import semver from "semver"
+const semver = require("semver")
 let deprecatedPackages = null
 
-export function isDeprecatedPackage(name, version) {
+var isDeprecatedPackage = module.exports.isDeprecatedPackage = function isDeprecatedPackage(name, version) {
   if (deprecatedPackages == null) {
     let left
     deprecatedPackages = (left = require("../deprecated-packages")) != null ? left : {}

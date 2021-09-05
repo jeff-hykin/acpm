@@ -1,19 +1,13 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import * as _ from "@aminya/underscore-plus"
-import yargs from "yargs"
-import Command from "./command"
-import * as config from "./apm"
-import Install from "./install"
-import Login from "./login"
-import * as request from "./request"
-import { tree } from "./tree"
+const _ = require("@aminya/underscore-plus")
+const yargs = require("yargs")
+const Command = require("./command")
+const config = require("./apm")
+const Install = require("./install")
+const Login = require("./login")
+const request = require("./request")
+const tree = require("./tree").tree;
 
-export default class Stars extends Command {
+module.exports  = class Stars extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\

@@ -1,23 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import url from "url"
-import yargs from "yargs"
-import Git from "git-utils"
-import semver from "semver"
-import fs from "fysh"
-import * as config from "./apm"
-import Command from "./command"
-import Login from "./login"
-import * as Packages from "./packages"
-import * as request from "./request"
+const path = require("path")
+const url = require("url")
+const yargs = require("yargs")
+const Git = require("git-utils")
+const semver = require("semver")
+const fs = require("fysh")
+const config = require("./apm")
+const Command = require("./command")
+const Login = require("./login")
+const Packages = require("./packages")
+const request = require("./request")
 
-export default class Publish extends Command {
+module.exports = class Publish extends Command {
   constructor() {
     super()
     this.userConfigPath = config.getUserConfigPath()
@@ -403,7 +396,7 @@ have published it.\
           return true
         }
       } catch (error) {
-        /* ignore error */
+        // ignore error
       }
 
       return semverRange === "latest"

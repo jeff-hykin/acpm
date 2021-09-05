@@ -1,13 +1,7 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import yargs from "yargs"
-import Command from "./command"
+const yargs = require("yargs")
+const Command = require("./command")
 
-export default class Clean extends Command {
+module.exports  = class Clean extends Command {
   constructor() {
     super()
     this.atomNpmPath = require.resolve("npm/bin/npm-cli")

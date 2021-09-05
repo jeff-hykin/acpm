@@ -1,15 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import yargs from "yargs"
-import temp from "temp"
-import Command from "./command"
-import fs from "fysh"
+const path = require("path")
+const yargs = require("yargs")
+const temp = require("temp")
+const Command = require("./command")
+const fs = require("fysh")
 
-export default class Test extends Command {
+module.exports = class Test extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
 
@@ -55,7 +50,7 @@ to the current working directory).\
             process.stdout.write(`${loggedOutput}\n`)
           }
         } catch (error) {
-          /* ignore error */
+          // ignore error
         }
 
         if (code === 0) {

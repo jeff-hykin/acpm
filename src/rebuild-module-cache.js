@@ -1,17 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import async from "async"
-import yargs from "yargs"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
+const path = require("path")
+const asyncLib = require("async")
+const yargs = require("yargs")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
 
-export default class RebuildModuleCache extends Command {
+module.exports  = class RebuildModuleCache extends Command {
   constructor() {
     super()
     this.atomPackagesDirectory = path.join(config.getAtomDirectory(), "packages")
@@ -84,6 +78,6 @@ This command skips all linked packages.\
       })
     })
 
-    return async.waterfall(commands, callback)
+    return asyncLib.waterfall(commands, callback)
   }
 }

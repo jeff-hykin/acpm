@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 let keytar
 try {
   keytar = require("keytar")
@@ -28,7 +23,7 @@ const tokenName = "Atom.io API Token"
 //
 // callback - A function to call with an error as the first argument and a
 //            string token as the second argument.
-export function getToken(callback) {
+var getToken = module.exports.getToken = function getToken(callback) {
   return keytar
     .findPassword(tokenName)
     .then(function (token) {
@@ -54,6 +49,6 @@ Run \`apm login\` or set the \`ATOM_ACCESS_TOKEN\` environment variable.\
 // Save the given token to the keychain.
 //
 // token - A string token to save.
-export function saveToken(token) {
+var saveToken = module.exports.saveToken = function saveToken(token) {
   return keytar.setPassword(tokenName, "atom.io", token)
 }

@@ -1,16 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import yargs from "yargs"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
-import { tree } from "./tree"
+const path = require("path")
+const yargs = require("yargs")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
+const tree = require("./tree").tree;
 
-export default class Links extends Command {
+module.exports  = class Links extends Command {
   constructor() {
     super()
     this.devPackagesPath = path.join(config.getAtomDirectory(), "dev", "packages")

@@ -1,12 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-
-export function tree(items, options = {}, callback) {
+var tree = module.exports.tree = function(items, options = {}, callback) {
   if (typeof options === "function") {
     callback = options
     options = {}

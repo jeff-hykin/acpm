@@ -1,17 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import url from "url"
-import fs from "fysh"
-import * as request from "./request"
-import TextMateTheme from "./text-mate-theme"
+const path = require("path")
+const url = require("url")
+const fs = require("fysh")
+const request = require("./request")
+const TextMateTheme = require("./text-mate-theme")
 
 // Convert a TextMate theme to an Atom theme
-export default class ThemeConverter {
+module.exports  = class ThemeConverter {
   constructor(sourcePath, destinationPath) {
     this.sourcePath = sourcePath
     this.destinationPath = path.resolve(destinationPath)

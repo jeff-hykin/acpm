@@ -1,13 +1,6 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import npm from "npm"
-import request from "request"
-import * as config from "./apm"
+const npm = require("npm")
+const request = require("request")
+const config = require("./apm")
 
 function loadNpm(callback) {
   const npmOptions = {
@@ -40,7 +33,7 @@ function configureRequest(requestOptions, callback) {
   })
 }
 
-export function get(requestOptions, callback) {
+var get = module.exports.get = function get(requestOptions, callback) {
   return configureRequest(requestOptions, function () {
     let retryCount = requestOptions.retries != null ? requestOptions.retries : 0
     let requestsMade = 0
@@ -63,19 +56,19 @@ export function get(requestOptions, callback) {
   })
 }
 
-export function del(requestOptions, callback) {
+var del = module.exports.del = function del(requestOptions, callback) {
   return configureRequest(requestOptions, () => request.del(requestOptions, callback))
 }
 
-export function post(requestOptions, callback) {
+var post = module.exports.post = function post(requestOptions, callback) {
   return configureRequest(requestOptions, () => request.post(requestOptions, callback))
 }
 
-export function createReadStream(requestOptions, callback) {
+var createReadStream = module.exports.createReadStream = function createReadStream(requestOptions, callback) {
   return configureRequest(requestOptions, () => callback(request.get(requestOptions)))
 }
 
-export function getErrorMessage(response, body) {
+var getErrorMessage = module.exports.getErrorMessage = function getErrorMessage(response, body) {
   if (response?.statusCode === 503) {
     return "atom.io is temporarily unavailable, please try again later."
   } else {
@@ -84,6 +77,6 @@ export function getErrorMessage(response, body) {
   }
 }
 
-export function debug(debug) {
+var debug = module.exports.debug = function debug(debug) {
   return (request.debug = debug)
 }

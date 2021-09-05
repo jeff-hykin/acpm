@@ -1,17 +1,8 @@
-/*
- * decaffeinate suggestions:
- * use named exports
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import { spawn } from "child_process"
-import path from "path"
-import npm from "npm"
-import * as config from "./apm"
-import fs from "fysh"
+const spawn = require("child_process").spawn
+const path = require("path")
+const npm = require("npm")
+const config = require("./apm")
+const fs = require("fysh")
 
 const addPortableGitToEnv = function (env) {
   let children
@@ -67,7 +58,7 @@ const addGitBashToEnv = function (env) {
   }
 }
 
-export function addGitToEnv(env) {
+var addGitToEnv = module.exports.addGitToEnv = function addGitToEnv(env) {
   if (process.platform !== "win32") {
     return
   }
@@ -75,7 +66,7 @@ export function addGitToEnv(env) {
   return addGitBashToEnv(env)
 }
 
-export function getGitVersion(callback) {
+var getGitVersion = module.exports.getGitVersion = function getGitVersion(callback) {
   const npmOptions = {
     userconfig: config.getUserConfigPath(),
     globalconfig: config.getGlobalConfigPath(),
@@ -89,7 +80,7 @@ export function getGitVersion(callback) {
     spawned.stderr.on("data", (chunk) => outputChunks.push(chunk))
     spawned.stdout.on("data", (chunk) => outputChunks.push(chunk))
     spawned.on("error", function () {
-      /* ignore error */
+      // ignore error
     })
     return spawned.on("close", function (code) {
       let version

@@ -1,18 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import yargs from "yargs"
-import Command from "./command"
-import fs from "fysh"
+const path = require("path")
+const yargs = require("yargs")
+const Command = require("./command")
+const fs = require("fysh")
 
 const supportedSyntaxes = ["coffeescript", "javascript"]
 
-export default class Init extends Command {
+module.exports  = class Init extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
 

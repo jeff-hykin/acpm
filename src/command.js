@@ -1,19 +1,12 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import child_process from "child_process"
-import path from "path"
-import * as _ from "@aminya/underscore-plus"
-import semver from "semver"
-import * as config from "./apm"
-import * as git from "./git"
+const child_process = require("child_process")
+const path = require("path")
+const _ = require("@aminya/underscore-plus")
+const semver = require("semver")
+const config = require("./apm")
+const git = require("./git")
 
-export default class Command {
+
+module.exports  = class Command {
   constructor() {
     this.logCommandResults = this.logCommandResults.bind(this)
     this.logCommandResultsIfFail = this.logCommandResultsIfFail.bind(this)
@@ -128,7 +121,7 @@ export default class Command {
           this.installedAtomVersion = version
         }
       } catch (error) {
-        /* ignore error */
+        // ignore error
       }
 
       this.electronVersion =

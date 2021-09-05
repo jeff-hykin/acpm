@@ -1,17 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import async from "async"
-import yargs from "yargs"
-import * as config from "./apm"
-import Command from "./command"
-import fs from "fysh"
+const path = require("path")
+const asyncLib = require("async")
+const yargs = require("yargs")
+const config = require("./apm")
+const Command = require("./command")
+const fs = require("fysh")
 
-export default class Dedupe extends Command {
+module.exports  = class Dedupe extends Command {
   constructor() {
     super()
     this.atomDirectory = config.getAtomDirectory()
@@ -89,6 +83,6 @@ This command is experimental.\
     const commands = []
     commands.push((callback) => this.loadInstalledAtomMetadata(callback))
     commands.push((callback) => this.dedupeModules(options, callback))
-    return async.waterfall(commands, callback)
+    return asyncLib.waterfall(commands, callback)
   }
 }

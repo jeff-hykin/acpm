@@ -1,18 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import CSON from "season"
-import yargs from "yargs"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
+const path = require("path")
+const CSON = require("season")
+const yargs = require("yargs")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
 
-export default class Link extends Command {
+module.exports = class Link extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\
@@ -41,7 +34,7 @@ Run \`apm links\` to view all the currently linked packages.\
         packageName = CSON.readFileSync(CSON.resolve(path.join(linkPath, "package"))).name
       }
     } catch (error1) {
-      /* ignore error */
+      // ignore error
     }
     if (!packageName) {
       packageName = path.basename(linkPath)

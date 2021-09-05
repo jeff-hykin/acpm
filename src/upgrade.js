@@ -1,26 +1,19 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import async from "async"
-import yargs from "yargs"
-import read from "read"
-import semver from "semver"
-import Git from "git-utils"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
-import Install from "./install"
-import * as Packages from "./packages"
-import * as request from "./request"
-import { tree } from "./tree"
-import * as git from "./git"
+const path = require("path")
+const async = require("async")
+const yargs = require("yargs")
+const read = require("read")
+const semver = require("semver")
+const Git = require("git-utils")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
+const Install = require("./install")
+const Packages = require("./packages")
+const request = require("./request")
+const tree = require("./tree").tree;
+const git = require("./git")
 
-export default class Upgrade extends Command {
+module.exports = class Upgrade extends Command {
   constructor() {
     super()
     this.atomDirectory = config.getAtomDirectory()
@@ -80,7 +73,7 @@ available updates.\
         return metadata
       }
     } catch (error) {
-      /* ignore error */
+      // ignore error
     }
   }
 

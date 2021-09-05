@@ -1,20 +1,14 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import async from "async"
-import CSON from "season"
-import yargs from "yargs"
+const path = require("path")
+const asyncLib = require("async")
+const CSON = require("season")
+const yargs = require("yargs")
+const auth = require("./auth")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
+const request = require("./request")
 
-import * as auth from "./auth"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
-import * as request from "./request"
-
-export default class Uninstall extends Command {
+module.exports  = class Uninstall extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\
@@ -111,6 +105,6 @@ Delete the installed package(s) from the ~/.atom/packages directory.\
       }
     }
 
-    return async.eachSeries(uninstallsToRegister, this.registerUninstall.bind(this), () => callback(uninstallError))
+    return asyncLib.eachSeries(uninstallsToRegister, this.registerUninstall.bind(this), () => callback(uninstallError))
   }
 }

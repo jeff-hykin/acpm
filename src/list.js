@@ -1,20 +1,13 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import CSON from "season"
-import yargs from "yargs"
-import Command from "./command"
-import fs from "fysh"
-import * as config from "./apm"
-import { tree } from "./tree"
-import { getRepository } from "./packages"
+const path = require("path")
+const CSON = require("season")
+const yargs = require("yargs")
+const Command = require("./command")
+const fs = require("fysh")
+const config = require("./apm")
+const tree = require("./tree").tree;
+const getRepository = require("./packages").getRepository;
 
-export default class List extends Command {
+module.exports = class List extends Command {
   constructor() {
     super()
     let configPath
@@ -24,7 +17,7 @@ export default class List extends Command {
       try {
         this.disabledPackages = CSON.readFileSync(configPath)?.["*"]?.core?.disabledPackages
       } catch (error) {
-        /* ignore error */
+        // ignore error
       }
     }
     if (this.disabledPackages == null) {
@@ -141,7 +134,7 @@ List all the installed packages and also the packages bundled with Atom.\
         try {
           manifest = CSON.readFileSync(manifestPath)
         } catch (error) {
-          /* ignore error */
+          // ignore error
         }
       }
       if (manifest == null) {
@@ -200,7 +193,7 @@ List all the installed packages and also the packages bundled with Atom.\
         const metadataPath = path.join(resourcePath, "package.json")
         ;({ _atomPackages } = JSON.parse(fs.readFileSync(metadataPath)))
       } catch (error) {
-        /* ignore error */
+        // ignore error
       }
       if (_atomPackages == null) {
         _atomPackages = {}

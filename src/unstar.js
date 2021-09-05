@@ -1,18 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import async from "async"
-import yargs from "yargs"
-import * as config from "./apm"
-import Command from "./command"
-import Login from "./login"
-import * as request from "./request"
+const asyncLib = require("async")
+const yargs = require("yargs")
+const config = require("./apm")
+const Command = require("./command")
+const Login = require("./login")
+const request = require("./request")
 
-export default class Unstar extends Command {
+module.exports  = class Unstar extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\
@@ -71,7 +64,7 @@ Run \`apm stars\` to see all your starred packages.\
       const commands = packageNames.map((packageName) => {
         return (callback) => this.starPackage(packageName, token, callback)
       })
-      return async.waterfall(commands, callback)
+      return asyncLib.waterfall(commands, callback)
     })
   }
 }

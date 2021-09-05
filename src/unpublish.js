@@ -1,22 +1,13 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import readline from "readline"
-import yargs from "yargs"
+const path = require("path")
+const readline = require("readline")
+const yargs = require("yargs")
+const auth = require("./auth")
+const Command = require("./command")
+const config = require("./apm")
+const fs = require("fysh")
+const request = require("./request")
 
-import * as auth from "./auth"
-import Command from "./command"
-import * as config from "./apm"
-import fs from "fysh"
-import * as request from "./request"
-
-export default class Unpublish extends Command {
+module.exports = class Unpublish extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
 
@@ -129,7 +120,7 @@ name is specified.\
       try {
         name = JSON.parse(fs.readFileSync("package.json"))?.name
       } catch (error) {
-        /* ignore error */
+        // ignore error
       }
     }
 

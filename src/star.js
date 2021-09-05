@@ -1,23 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import * as _ from "@aminya/underscore-plus"
-import async from "async"
-import CSON from "season"
-import yargs from "yargs"
-import * as config from "./apm"
-import Command from "./command"
-import fs from "fysh"
-import Login from "./login"
-import * as Packages from "./packages"
-import * as request from "./request"
+const path = require("path")
+const _ = require("@aminya/underscore-plus")
+const async = require("async")
+const CSON = require("season")
+const yargs = require("yargs")
+const config = require("./apm")
+const Command = require("./command")
+const fs = require("fysh")
+const Login = require("./login")
+const Packages = require("./packages")
+const request = require("./request")
 
-export default class Star extends Command {
+module.exports = class Star extends Command {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\
@@ -79,7 +72,7 @@ Run \`apm stars\` to see all your starred packages.\
             installedPackages.push(metadata.name)
           }
         } catch (error) {
-          /* ignore error */
+          // ignore error
         }
       }
     }

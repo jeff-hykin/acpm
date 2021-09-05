@@ -1,17 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import child_process from "child_process"
-import fs from "fysh"
-import path from "path"
-import npm from "npm"
+const child_process = require("child_process")
+const fs = require("fysh")
+const path = require("path")
+const npm = require("npm")
 let asarPath = null
 
-export function getHomeDirectory() {
+var getHomeDirectory = module.exports.getHomeDirectory = function getHomeDirectory() {
   if (process.platform === "win32") {
     return process.env.USERPROFILE
   } else {
@@ -19,11 +12,11 @@ export function getHomeDirectory() {
   }
 }
 
-export function getAtomDirectory() {
+var getAtomDirectory = module.exports.getAtomDirectory = function getAtomDirectory() {
   return process.env.ATOM_HOME != null ? process.env.ATOM_HOME : path.join(getHomeDirectory(), ".atom")
 }
 
-export function getRustupHomeDirPath() {
+var getRustupHomeDirPath = module.exports.getRustupHomeDirPath = function getRustupHomeDirPath() {
   if (process.env.RUSTUP_HOME) {
     return process.env.RUSTUP_HOME
   } else {
@@ -31,11 +24,11 @@ export function getRustupHomeDirPath() {
   }
 }
 
-export function getCacheDirectory() {
+var getCacheDirectory = module.exports.getCacheDirectory = function getCacheDirectory() {
   return path.join(getAtomDirectory(), ".apm")
 }
 
-export function getResourcePath(callback) {
+var getResourcePath = module.exports.getResourcePath = function getResourcePath(callback) {
   if (process.env.ATOM_RESOURCE_PATH) {
     return process.nextTick(() => callback(process.env.ATOM_RESOURCE_PATH))
   }
@@ -98,23 +91,23 @@ export function getResourcePath(callback) {
   }
 }
 
-export function getReposDirectory() {
+var getReposDirectory = module.exports.getReposDirectory = function getReposDirectory() {
   return process.env.ATOM_REPOS_HOME != null ? process.env.ATOM_REPOS_HOME : path.join(getHomeDirectory(), "github")
 }
 
-export function getElectronUrl() {
+var getElectronUrl = module.exports.getElectronUrl = function getElectronUrl() {
   return process.env.ATOM_ELECTRON_URL != null ? process.env.ATOM_ELECTRON_URL : "https://atom.io/download/electron"
 }
 
-export function getAtomPackagesUrl() {
+var getAtomPackagesUrl = module.exports.getAtomPackagesUrl = function getAtomPackagesUrl() {
   return process.env.ATOM_PACKAGES_URL != null ? process.env.ATOM_PACKAGES_URL : `${getAtomApiUrl()}/packages`
 }
 
-export function getAtomApiUrl() {
+var getAtomApiUrl = module.exports.getAtomApiUrl = function getAtomApiUrl() {
   return process.env.ATOM_API_URL != null ? process.env.ATOM_API_URL : "https://atom.io/api"
 }
 
-export function getElectronArch() {
+var getElectronArch = module.exports.getElectronArch = function getElectronArch() {
   switch (process.platform) {
     case "darwin":
       return "x64"
@@ -123,23 +116,23 @@ export function getElectronArch() {
   }
 }
 
-export function getUserConfigPath() {
+var getUserConfigPath = module.exports.getUserConfigPath = function getUserConfigPath() {
   return path.resolve(getAtomDirectory(), ".apmrc")
 }
 
-export function getGlobalConfigPath() {
+var getGlobalConfigPath = module.exports.getGlobalConfigPath = function getGlobalConfigPath() {
   return path.resolve(getAtomDirectory(), ".apm", ".apmrc")
 }
 
-export function isWin32() {
+var isWin32 = module.exports.isWin32 = function isWin32() {
   return process.platform === "win32"
 }
 
-export function x86ProgramFilesDirectory() {
+var x86ProgramFilesDirectory = module.exports.x86ProgramFilesDirectory = function x86ProgramFilesDirectory() {
   return process.env["ProgramFiles(x86)"] || process.env.ProgramFiles
 }
 
-export function getInstalledVisualStudioFlag() {
+var getInstalledVisualStudioFlag = module.exports.getInstalledVisualStudioFlag = function getInstalledVisualStudioFlag() {
   if (!isWin32()) {
     return null
   }
@@ -160,7 +153,7 @@ export function getInstalledVisualStudioFlag() {
   }
 }
 
-export function visualStudioIsInstalled(version) {
+var visualStudioIsInstalled = module.exports.visualStudioIsInstalled = function visualStudioIsInstalled(version) {
   if (version < 2017) {
     return fs.existsSync(path.join(x86ProgramFilesDirectory(), `Microsoft Visual Studio ${version}`, "Common7", "IDE"))
   } else {
@@ -184,7 +177,7 @@ export function visualStudioIsInstalled(version) {
   }
 }
 
-export function loadNpm(callback) {
+var loadNpm = module.exports.loadNpm = function loadNpm(callback) {
   const npmOptions = {
     userconfig: getUserConfigPath(),
     globalconfig: getGlobalConfigPath(),
@@ -192,11 +185,11 @@ export function loadNpm(callback) {
   return npm.load(npmOptions, () => callback(null, npm))
 }
 
-export function getSetting(key, callback) {
+var getSetting = module.exports.getSetting = function getSetting(key, callback) {
   return loadNpm(() => callback(npm.config.get(key)))
 }
 
-export function setupApmRcFile() {
+var setupApmRcFile = module.exports.setupApmRcFile = function setupApmRcFile() {
   try {
     return fs.writeFileSync(
       getGlobalConfigPath(),
@@ -211,6 +204,6 @@ progress = false\
 `
     )
   } catch (error) {
-    /* ignore error */
+    // ignore error
   }
 }

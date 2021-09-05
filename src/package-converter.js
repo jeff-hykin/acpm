@@ -1,25 +1,17 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import url from "url"
-import zlib from "zlib"
-import * as _ from "@aminya/underscore-plus"
-import CSON from "season"
-import plist from "@atom/plist"
-import { ScopeSelector } from "first-mate"
-import tar from "tar"
-import temp from "temp"
-import fs from "fysh"
-import * as request from "./request"
+const path = require("path")
+const url = require("url")
+const zlib = require("zlib")
+const _ = require("@aminya/underscore-plus")
+const CSON = require("season")
+const plist = require("@atom/plist")
+const ScopeSelector = require("first-mate").ScopeSelector;
+const tar = require("tar")
+const temp = require("temp")
+const fs = require("fysh")
+const request = require("./request")
 
 // Convert a TextMate bundle to an Atom package
-export default class PackageConverter {
+module.exports = class PackageConverter {
   constructor(sourcePath, destinationPath) {
     this.sourcePath = sourcePath
     this.destinationPath = path.resolve(destinationPath)
@@ -75,7 +67,7 @@ export default class PackageConverter {
     try {
       packageName = JSON.parse(fs.readFileSync(path.join(sourcePath, "package.json")))?.packageName
     } catch (error) {
-      /* ignore error */
+      // ignore error
     }
     if (packageName == null) {
       packageName = path.basename(this.destinationPath)

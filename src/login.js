@@ -1,19 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS002: Fix invalid constructor
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import yargs from "yargs"
-import Q from "q"
-import read from "read"
-import open from "open"
+const yargs = require("yargs")
+const Q = require("q")
+const read = require("read")
+const open = require("open")
+const auth = require("./auth")
+const Command = require("./command")
 
-import * as auth from "./auth"
-import Command from "./command"
-
-export default class Login extends Command {
+module.exports  = class Login extends Command {
   constructor(...args) {
     this.welcomeMessage = this.welcomeMessage.bind(this)
     this.getToken = this.getToken.bind(this)

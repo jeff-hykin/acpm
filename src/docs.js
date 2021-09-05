@@ -1,15 +1,8 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import yargs from "yargs"
-import open from "open"
-import View from "./view"
+const yargs = require("yargs")
+const open = require("open")
+const View = require("./view")
 
-export default class Docs extends View {
+module.exports  = class Docs extends View {
   parseOptions(argv) {
     const options = yargs(argv).wrap(Math.min(100, yargs.terminalWidth()))
     options.usage(`\

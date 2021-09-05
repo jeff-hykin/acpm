@@ -1,16 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import yargs from "yargs"
-import * as config from "./apm"
-import Command from "./command"
-import fs from "fysh"
+const path = require("path")
+const yargs = require("yargs")
+const config = require("./apm")
+const Command = require("./command")
+const fs = require("fysh")
 
-export default class Rebuild extends Command {
+module.exports  = class Rebuild extends Command {
   constructor() {
     super()
     this.atomDirectory = config.getAtomDirectory()

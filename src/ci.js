@@ -1,17 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import path from "path"
-import fs from "fysh"
-import yargs from "yargs"
-import async from "async"
-import * as config from "./apm"
-import Command from "./command"
+const path = require("path")
+const fs = require("fysh")
+const yargs = require("yargs")
+const asyncLib = require("async")
+const config = require("./apm")
+const Command = require("./command")
 
-export default class Ci extends Command {
+module.exports  = class Ci extends Command {
   constructor() {
     super()
     this.atomDirectory = config.getAtomDirectory()
@@ -82,7 +76,7 @@ but cannot be used to install new packages or dependencies.\
     commands.push((cb) => this.installModules(opts, cb))
 
     const iteratee = (item, next) => item(next)
-    return async.mapSeries(commands, iteratee, function (err) {
+    return asyncLib.mapSeries(commands, iteratee, function (err) {
       if (err) {
         return callback(err)
       }

@@ -1,23 +1,15 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import fs from "fs"
-import path from "path"
-import async from "async"
-import yargs from "yargs"
-import * as config from "./apm"
-import Command from "./command"
-import Install from "./install"
-import * as git from "./git"
-import Link from "./link"
-import * as request from "./request"
+const fs = require("fs")
+const path = require("path")
+const asyncLib = require("async")
+const yargs = require("yargs")
+const config = require("./apm")
+const Command = require("./command")
+const Install = require("./install")
+const git = require("./git")
+const Link = require("./link")
+const request = require("./request")
 
-export default class Develop extends Command {
+module.exports  = class Develop extends Command {
   constructor() {
     super()
     this.atomDirectory = config.getAtomDirectory()
@@ -125,7 +117,7 @@ cmd-shift-o to run the package out of the newly cloned repository.\
 
           tasks.push((cb) => this.linkPackage(packageDirectory, options, cb))
 
-          return async.waterfall(tasks, callback)
+          return asyncLib.waterfall(tasks, callback)
         }
       })
     }
