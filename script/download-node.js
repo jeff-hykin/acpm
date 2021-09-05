@@ -22,92 +22,96 @@ const identifyArch = function () {
   }
 }
 
-const downloadFileToLocation = function (url, filename, callback) {
-  const stream = fs.createWriteStream(filename)
-  stream.on("end", callback)
-  stream.on("error", callback)
-  const requestStream = request.get(url)
-  requestStream.on("response", function (response) {
-    if (response.statusCode == 404) {
-      console.error("download not found:", url)
-      process.exit(1)
-    }
-    requestStream.pipe(stream)
-  })
-}
-
-const downloadTarballAndExtract = function (url, location, callback) {
-  const tempPath = temp.mkdirSync("apm-node-")
-  const stream = tar.extract({
-    cwd: tempPath,
-  })
-  stream.on("end", function () {
-    callback.call(this, tempPath)
-  })
-  stream.on("error", callback)
-  const requestStream = request.get(url)
-  requestStream.on("response", function (response) {
-    if (response.statusCode == 404) {
-      console.error("download not found:", url)
-      process.exit(1)
-    }
-    requestStream.pipe(zlib.createGunzip()).pipe(stream)
-  })
-}
-
-const copyNodeBinToLocation = function (callback, version, targetFilename, fromDirectory) {
-  const arch = identifyArch()
-  const subDir = `node-${version}-${process.platform}-${arch}`
-  const downloadedNodePath = path.join(fromDirectory, subDir, "bin", "node")
-  return mv(downloadedNodePath, targetFilename, { mkdirp: true }, function (err) {
-    if (err) {
-      callback(err)
-      return
-    }
-
-    fs.chmodSync(targetFilename, "755")
-    callback()
-  })
-}
-
-const downloadNode = function (version, done) {
-  const arch = identifyArch()
-  const filename = path.join(__dirname, "..", "bin", process.platform === "win32" ? "node.exe" : "node")
-
-  const downloadFile = function () {
-    if (process.platform === "win32") {
-      downloadFileToLocation(`https://nodejs.org/dist/${version}/win-${arch}/node.exe`, filename, done)
-    } else {
-      const next = copyNodeBinToLocation.bind(this, done, version, filename)
-      downloadTarballAndExtract(
-        `https://nodejs.org/dist/${version}/node-${version}-${process.platform}-${arch}.tar.gz`,
-        filename,
-        next
-      )
-    }
-  }
-
-  if (fs.existsSync(filename)) {
-    getInstallNodeVersion(filename, function (error, installedVersion, installedArch) {
-      if (error != null) {
-        done(error)
-      } else if (installedVersion !== version || installedArch !== process.arch) {
-        downloadFile()
-      } else {
-        done()
-      }
+const downloadFileToLocation = async function (url, filename) {
+    return new Promise((resolve, reject)=>{
+        const stream = fs.createWriteStream(filename)
+        stream.on("end", resolve)
+        stream.on("error", reject)
+        const requestStream = request.get(url)
+        requestStream.on("response", function (response) {
+            if (response.statusCode == 404) {
+            console.error("download not found:", url)
+            process.exit(1)
+            }
+            requestStream.pipe(stream)
+        })
     })
-  } else {
-    downloadFile()
-  }
+}
+
+const downloadTarballAndExtract = function (url, location) {
+    return new Promise((resolve, reject)=>{
+        const tempPath = temp.mkdirSync("apm-node-")
+        const stream = tar.extract({
+            cwd: tempPath,
+        })
+        stream.on("end", function () {
+            resolve.call(this, tempPath)
+        })
+        stream.on("error", reject)
+        const requestStream = request.get(url)
+        requestStream.on("response", function (response) {
+            if (response.statusCode == 404) {
+            console.error("download not found:", url)
+            process.exit(1)
+            }
+            requestStream.pipe(zlib.createGunzip()).pipe(stream)
+        })
+    })
+}
+
+const copyNodeBinToLocation = async function (version, targetFilename, fromDirectory) {
+    return new Promise((resolve, reject)=>{
+        const arch = identifyArch()
+        const subDir = `node-${version}-${process.platform}-${arch}`
+        const downloadedNodePath = path.join(fromDirectory, subDir, "bin", "node")
+        let output
+        output = mv(downloadedNodePath, targetFilename, { mkdirp: true }, function (err) {
+            if (err) {
+                reject(err)
+                return
+            }
+
+            fs.chmodSync(targetFilename, "755")
+            resolve(output)
+        })
+    })
+}
+
+const downloadNode = async function (version, ) {
+    try {
+        const arch = identifyArch()
+        const filename = path.join(__dirname, "..", "bin", process.platform === "win32" ? "node.exe" : "node")
+
+        const downloadFile = async function () {
+            if (process.platform === "win32") {
+                return downloadFileToLocation(`https://nodejs.org/dist/${version}/win-${arch}/node.exe`, filename)
+            } else {
+                const next = await copyNodeBinToLocation.bind(this, version, filename)
+                return downloadTarballAndExtract(
+                    `https://nodejs.org/dist/${version}/node-${version}-${process.platform}-${arch}.tar.gz`,
+                    filename,
+                )
+            }
+        }
+
+        if (fs.existsSync(filename)) {
+            try {
+                var [installedVersion, installedArch] = await getInstallNodeVersion(filename)
+            } catch (error) {
+                console.warn("Warning: issues when checking node version", error)
+            }
+            if (installedVersion !== version || installedArch !== process.arch) {
+                downloadFile()
+            }
+        } else {
+            downloadFile()
+        }
+    } catch (error) {
+        console.error("Failed to download node", error)
+        return process.exit(1)
+    }
+    return process.exit(0)
 }
 
 const versionToInstall = fs.readFileSync(path.resolve(__dirname, "..", ".npmrc"), "utf8").match(/target=(.*)\n/)[1]
-downloadNode(versionToInstall, function (error) {
-  if (error != null) {
-    console.error("Failed to download node", error)
-    return process.exit(1)
-  } else {
-    return process.exit(0)
-  }
-})
+downloadNode(versionToInstall)
