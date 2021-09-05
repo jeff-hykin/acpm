@@ -53,16 +53,26 @@
 # from = "c92ca95afb5043bc6faa0d526460584eccff2277" 
 
 # version 14.17.1
-load = [ "nodejs",]
-from = "860b56be91fb874d48e23a950815969a7b832fbc" 
+# load = [ "nodejs",]
+# from = "860b56be91fb874d48e23a950815969a7b832fbc" 
 
 # version 12.22.1
 # load = [ "nodejs-12_x",]
 # from = "860b56be91fb874d48e23a950815969a7b832fbc" 
 
+# version 12.18.3
+load = [ "nodejs",]
+from = "c4364cdddc421dfdb4a60fda38ed955abce1603a"
+
 # version 10.24.0
 # load = [ "nodejs-10_x",] 
 # from = "a765beccb52f30a30fee313fbae483693ffe200d" 
+
+[[packages]]
+load = [ "nodePackages", "pnpm", ]
+from = "c4364cdddc421dfdb4a60fda38ed955abce1603a"
+
+
 
 # 
 # Python (because node-gyp depends on python)
