@@ -7,7 +7,7 @@ if (process.platform === "win32") {
   bundledNodePath += ".exe"
 }
 
-getBundledNodeVersion(bundledNodePath).then(()=>{
+getBundledNodeVersion(bundledNodePath).then(([bundledVersion])=>{
     const ourVersion = process.version
 
     if (ourVersion !== bundledVersion) {

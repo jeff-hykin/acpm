@@ -10,3 +10,6 @@
 
 # source all the file in settings/during_clean/ in alphabetical order
 . "$FORNIX_FOLDER/settings/extensions/#standard/commands/tools/fornix/trigger" "$FORNIX_FOLDER/settings/during_clean"
+
+npm run clean.lib
+npm run clean.bin

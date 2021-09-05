@@ -1,7 +1,6 @@
-const fs = require("fs")
-const mv = require("mv")
+const fs = require('fs-extra')
+const path = require('path')
 const zlib = require("zlib")
-const path = require("path")
 
 const tar = require("tar")
 const temp = require("temp")
@@ -22,7 +21,7 @@ const identifyArch = function () {
   }
 }
 
-const downloadFileToLocation = async function (url, filename) {
+const downloadFileToLocation = function (url, filename) {
     return new Promise((resolve, reject)=>{
         const stream = fs.createWriteStream(filename)
         stream.on("end", resolve)
@@ -45,39 +44,30 @@ const downloadTarballAndExtract = function (url, location) {
             cwd: tempPath,
         })
         stream.on("end", function () {
-            resolve.call(this, tempPath)
+            resolve(tempPath)
         })
         stream.on("error", reject)
         const requestStream = request.get(url)
         requestStream.on("response", function (response) {
             if (response.statusCode == 404) {
-            console.error("download not found:", url)
-            process.exit(1)
+                console.error("download not found:", url)
+                process.exit(1)
             }
             requestStream.pipe(zlib.createGunzip()).pipe(stream)
         })
     })
 }
 
-const copyNodeBinToLocation = async function (version, targetFilename, fromDirectory) {
-    return new Promise((resolve, reject)=>{
-        const arch = identifyArch()
-        const subDir = `node-${version}-${process.platform}-${arch}`
-        const downloadedNodePath = path.join(fromDirectory, subDir, "bin", "node")
-        let output
-        output = mv(downloadedNodePath, targetFilename, { mkdirp: true }, function (err) {
-            if (err) {
-                reject(err)
-                return
-            }
-
-            fs.chmodSync(targetFilename, "755")
-            resolve(output)
-        })
-    })
+const copyNodeBinToLocation = function (version, targetFilename, fromDirectory) {
+    const arch = identifyArch()
+    const subDir = `node-${version}-${process.platform}-${arch}`
+    const downloadedNodePath = path.join(fromDirectory, subDir, "bin", "node")
+    fs.mkdirSync(path.dirname(targetFilename), { recursive: true })
+    fs.moveSync(downloadedNodePath, targetFilename, { overwrite: true })
+    fs.chmodSync(targetFilename, "755")
 }
 
-const downloadNode = async function (version, ) {
+const downloadNodeIfNeeded = async function (version, ) {
     try {
         const arch = identifyArch()
         const filename = path.join(__dirname, "..", "bin", process.platform === "win32" ? "node.exe" : "node")
@@ -86,14 +76,13 @@ const downloadNode = async function (version, ) {
             if (process.platform === "win32") {
                 return downloadFileToLocation(`https://nodejs.org/dist/${version}/win-${arch}/node.exe`, filename)
             } else {
-                const next = await copyNodeBinToLocation.bind(this, version, filename)
-                return downloadTarballAndExtract(
+                const tempPath = await downloadTarballAndExtract(
                     `https://nodejs.org/dist/${version}/node-${version}-${process.platform}-${arch}.tar.gz`,
                     filename,
                 )
+                copyNodeBinToLocation(version, filename, tempPath)
             }
         }
-
         if (fs.existsSync(filename)) {
             try {
                 var [installedVersion, installedArch] = await getInstallNodeVersion(filename)
@@ -101,10 +90,11 @@ const downloadNode = async function (version, ) {
                 console.warn("Warning: issues when checking node version", error)
             }
             if (installedVersion !== version || installedArch !== process.arch) {
-                downloadFile()
+                await downloadFile()
             }
         } else {
-            downloadFile()
+            console.log(`downloading`)
+            await downloadFile()
         }
     } catch (error) {
         console.error("Failed to download node", error)
@@ -114,4 +104,4 @@ const downloadNode = async function (version, ) {
 }
 
 const versionToInstall = fs.readFileSync(path.resolve(__dirname, "..", ".npmrc"), "utf8").match(/target=(.*)\n/)[1]
-downloadNode(versionToInstall)
+downloadNodeIfNeeded(versionToInstall)
