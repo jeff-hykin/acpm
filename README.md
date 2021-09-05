@@ -25,3 +25,7 @@ The strategy I suggest is to:
 - [ ] replace the old dependencies of the resulting code with modern replacements
 - [ ] replace npm things with pnpm
 - [ ] In the end, we can think about publishing on the `npm` registry or using Github packages
+
+# Setup
+
+Everything is detailed in the `documentation/setup.md`!
