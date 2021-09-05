@@ -9,7 +9,7 @@
 import { spawn } from "child_process"
 import path from "path"
 import colors from "colors"
-import npm from "npm"
+import pnpm from "pnpm"
 import yargs from "yargs"
 import wordwrap from "wordwrap"
 
@@ -160,7 +160,7 @@ function showHelp(options: CliOptions) {
 function printVersions(args, callback) {
   let left, left1
   const apmVersion = (left = require("../package.json").version) != null ? left : ""
-  const npmVersion = (left1 = require("npm/package.json").version) != null ? left1 : ""
+  const pnpmVersion = (left1 = require("pnpm/package.json").version) != null ? left1 : ""
   const nodeVersion = process.versions.node != null ? process.versions.node : ""
 
   return getPythonVersion((pythonVersion) =>
@@ -170,7 +170,7 @@ function printVersions(args, callback) {
         if (args.json) {
           versions = {
             apm: apmVersion,
-            npm: npmVersion,
+            pnpm: pnpmVersion,
             node: nodeVersion,
             atom: atomVersion,
             python: pythonVersion,
@@ -193,7 +193,7 @@ function printVersions(args, callback) {
           }
           versions = `\
 ${"apm".red}  ${apmVersion.red}
-${"npm".green}  ${npmVersion.green}
+${"pnpm".green}  ${pnpmVersion.green}
 ${"node".blue} ${nodeVersion.blue} ${process.arch.blue}
 ${"atom".cyan} ${atomVersion.cyan}
 ${"python".yellow} ${pythonVersion.yellow}
@@ -228,13 +228,13 @@ function getAtomVersion(callback) {
 }
 
 function getPythonVersion(callback) {
-  const npmOptions = {
+  const pnpmOptions = {
     userconfig: config.getUserConfigPath(),
     globalconfig: config.getGlobalConfigPath(),
   }
-  return npm.load(npmOptions, function () {
+  return pnpm.load(pnpmOptions, function () {
     let left
-    let python = (left = npm.config.get("python")) != null ? left : process.env.PYTHON
+    let python = (left = pnpm.config.get("python")) != null ? left : process.env.PYTHON
     if (config.isWin32() && !python) {
       let rootDir = process.env.SystemDrive != null ? process.env.SystemDrive : "C:\\"
       if (rootDir[rootDir.length - 1] !== "\\") {

@@ -14,7 +14,7 @@ import type { CliOptions, RunCallback } from "./apm-cli"
 
 export default class Ci extends Command {
   private atomDirectory = config.getAtomDirectory()
-  private atomNpmPath = require.resolve("npm/bin/npm-cli")
+  private atomPnpmPath = require.resolve("pnpm/bin/pnpm-cli")
   private atomNodeDirectory: string
   constructor() {
     super()
@@ -52,7 +52,7 @@ but cannot be used to install new packages or dependencies.\
       config.getGlobalConfigPath(),
       "--userconfig",
       config.getUserConfigPath(),
-      ...Array.from(this.getNpmBuildFlags()),
+      ...Array.from(this.getPnpmBuildFlags()),
     ]
     if (options.argv.verbose) {
       installArgs.push("--verbose")
@@ -65,7 +65,7 @@ but cannot be used to install new packages or dependencies.\
 
     const installOptions = { env, streaming: options.argv.verbose }
 
-    return this.fork(this.atomNpmPath, installArgs, installOptions, (...args: LogCommandResultsArgs) => {
+    return this.fork(this.atomPnpmPath, installArgs, installOptions, (...args: LogCommandResultsArgs) => {
       return this.logCommandResults(callback, ...args)
     })
   }
@@ -75,8 +75,8 @@ but cannot be used to install new packages or dependencies.\
 
     const commands = []
     commands.push((callback) => {
-      return config.loadNpm((error, npm) => {
-        this.npm = npm
+      return config.loadPnpm((error, pnpm) => {
+        this.pnpm = pnpm
         return callback(error)
       })
     })

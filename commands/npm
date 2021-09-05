@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# summary
+    # this is a wrapper to trick everything into using pnpm instead of npm
+
+pnpm "$@"

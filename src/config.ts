@@ -11,7 +11,7 @@ import type { CliOptions, RunCallback } from "./apm-cli"
 
 export default class Config extends Command {
   private atomDirectory = apm.getAtomDirectory()
-  private atomNpmPath = require.resolve("npm/bin/npm-cli")
+  private atomPnpmPath = require.resolve("pnpm/bin/pnpm-cli")
   private atomNodeDirectory: string
   constructor() {
     super()
@@ -41,7 +41,7 @@ Usage: apm config set <key> <value>
     const env = { ...process.env, HOME: this.atomNodeDirectory, RUSTUP_HOME: apm.getRustupHomeDirPath() }
     const configOptions = { env }
 
-    return this.fork(this.atomNpmPath, configArgs, configOptions, function (code, stderr = "", stdout = "") {
+    return this.fork(this.atomPnpmPath, configArgs, configOptions, function (code, stderr = "", stdout = "") {
       if (code === 0) {
         if (stdout) {
           process.stdout.write(stdout)
@@ -51,7 +51,7 @@ Usage: apm config set <key> <value>
         if (stderr) {
           process.stdout.write(stderr)
         }
-        return callback(new Error(`npm config failed: ${code}`))
+        return callback(new Error(`pnpm config failed: ${code}`))
       }
     })
   }

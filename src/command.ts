@@ -19,7 +19,7 @@ export default class Command {
   protected electronVersion: string
   installedAtomVersion: string
   protected resourcePath: string
-  npm: typeof import("npm")
+  pnpm: typeof import("pnpm")
   constructor() {
     this.logCommandResults = this.logCommandResults.bind(this)
     this.logCommandResultsIfFail = this.logCommandResultsIfFail.bind(this)
@@ -175,7 +175,7 @@ export default class Command {
     return (env.npm_config_target_arch = config.getElectronArch()) // for node-pre-gyp
   }
 
-  getNpmBuildFlags() {
+  getPnpmBuildFlags() {
     return [
       `--target=${this.electronVersion}`,
       `--disturl=${config.getElectronUrl()}`,
@@ -201,7 +201,7 @@ export default class Command {
 
   addProxyToEnv(env) {
     let left
-    const httpProxy = this.npm.config.get("proxy")
+    const httpProxy = this.pnpm.config.get("proxy")
     if (httpProxy) {
       if (env.HTTP_PROXY == null) {
         env.HTTP_PROXY = httpProxy
@@ -211,7 +211,7 @@ export default class Command {
       }
     }
 
-    const httpsProxy = this.npm.config.get("https-proxy")
+    const httpsProxy = this.pnpm.config.get("https-proxy")
     if (httpsProxy) {
       if (env.HTTPS_PROXY == null) {
         env.HTTPS_PROXY = httpsProxy
@@ -232,7 +232,7 @@ export default class Command {
     // node-gyp doesn't currently have an option for this so just set the
     // environment variable to bypass strict SSL
     // https://github.com/nodejs/node-gyp/issues/448
-    const useStrictSsl = (left = this.npm.config.get("strict-ssl")) != null ? left : true
+    const useStrictSsl = (left = this.pnpm.config.get("strict-ssl")) != null ? left : true
     if (!useStrictSsl) {
       return (env.NODE_TLS_REJECT_UNAUTHORIZED = 0)
     }

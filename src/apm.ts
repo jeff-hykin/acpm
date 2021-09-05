@@ -8,7 +8,7 @@
 import child_process from "child_process"
 import fs from "./fs"
 import path from "path"
-import npm from "npm"
+import pnpm from "pnpm"
 let asarPath = null
 
 export function getHomeDirectory() {
@@ -184,16 +184,16 @@ export function visualStudioIsInstalled(version) {
   }
 }
 
-export function loadNpm(callback: (config: null, npmVar: typeof npm) => void) {
-  const npmOptions = {
+export function loadPnpm(callback: (config: null, pnpmVar: typeof pnpm) => void) {
+  const pnpmOptions = {
     userconfig: getUserConfigPath(),
     globalconfig: getGlobalConfigPath(),
   }
-  return npm.load(npmOptions, () => callback(null, npm))
+  return pnpm.load(pnpmOptions, () => callback(null, pnpm))
 }
 
 export function getSetting(key, callback) {
-  return loadNpm(() => callback(npm.config.get(key)))
+  return loadPnpm(() => callback(pnpm.config.get(key)))
 }
 
 export function setupApmRcFile() {
@@ -206,7 +206,7 @@ export function setupApmRcFile() {
 ;
 ; You should instead edit your .apmrc config located in ~/.atom/.apmrc
 cache = ${getCacheDirectory()}
-; Hide progress-bar to prevent npm from altering apm console output.
+; Hide progress-bar to prevent pnpm from altering apm console output.
 progress = false\
 `
     )
