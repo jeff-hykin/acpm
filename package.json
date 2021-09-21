@@ -16,7 +16,7 @@
         "test.lint": "eslint .",
         "check-version": "node script/check-version.js",
         "clean.bin": "shx rm -rf bin/node_darwin_x64 bin/node.exe bin/node",
-        "prepare": "pnpm run build",
+        "prepare": "true",
         "postinstall": "node ./script/download-node.js && shx chmod +x ./bin/pnpm && shx chmod +x ./bin/apm",
         "get.fixtures": "node ./script/get-fixtures.js && shx cp -r ./spec/fixtures/r.tmbundle-patch/Snippets/ ./spec/fixtures/r.tmbundle/",
         "test": "pnpm run check-version && jasmine-focused --captureExceptions spec",
